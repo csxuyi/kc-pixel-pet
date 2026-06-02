@@ -348,6 +348,45 @@ details.help[open] summary .tri{transform:rotate(90deg)}
 
 .reveal{opacity:0; transform:translateY(14px); animation:reveal .6s cubic-bezier(.2,.8,.3,1) forwards;}
 @keyframes reveal{to{opacity:1; transform:none}}
+
+/* ===== 屏幕震动 ===== */
+@keyframes screenShake{
+  0%,100%{transform:translate(0)}
+  15%{transform:translate(-3px,2px) rotate(-0.4deg)}
+  30%{transform:translate(3px,-1px) rotate(0.3deg)}
+  50%{transform:translate(-2px,-2px) rotate(-0.2deg)}
+  70%{transform:translate(2px,1px) rotate(0.3deg)}
+  85%{transform:translate(-1px,-1px) rotate(-0.1deg)}
+}
+.stage.shake{animation:screenShake .35s ease-out}
+
+/* ===== 宠物额外状态 ===== */
+#pet.pat .pet-canvas-wrap{filter:brightness(1.08) saturate(1.2)}
+#pet.hug .pet-canvas-wrap{filter:brightness(1.15) saturate(1.15)}
+
+/* ===== 闲时歪头 ===== */
+@keyframes idleTilt{
+  0%,70%,100%{transform:rotate(0)}
+  78%{transform:rotate(-6deg)}
+  86%{transform:rotate(5deg)}
+  92%{transform:rotate(-2deg)}
+}
+#pet.idle-tilt{animation:idleTilt .9s ease-in-out}
+
+/* ===== 挥手 ===== */
+@keyframes waveArm{
+  0%,100%{transform:rotate(0)}
+  25%{transform:rotate(-12deg)}
+  75%{transform:rotate(12deg)}
+}
+#pet.waving{animation:waveArm .3s ease-in-out 3}
+
+/* ===== 暖光粒子 ===== */
+@keyframes warmGlow{
+  0%{opacity:0;transform:scale(.5)}
+  30%{opacity:.7;transform:scale(1.3)}
+  100%{opacity:0;transform:scale(2)}
+}
 </style>
 </head>
 <body>
@@ -570,6 +609,27 @@ const PRESETS = [
 ];
 const MOOD_EMOJI = {neutral:"😐",happy:"😄",surprise:"😮",angry:"😠",sad:"🥺",kiss:"😘"};
 
+/* ---- 丰富气泡台词池 ---- */
+const BUBBLE_POOL = {
+  neutral:["……在呢","嗯？","盯着你看 👀","发呆中…","好像有点无聊","zzZ…啊！没睡着"],
+  happy:["嘿嘿，找到你啦！","今天真开心呀～","耶！✌️","嘻嘻，心情超好","开心到冒泡！"],
+  surprise:["哇——！","天哪！","真的假的？！","好厉害！","惊呆了我"],
+  angry:["哼！别闹啦！","生气了！","不跟你玩了 💢","哼唧唧","怒！"],
+  sad:["呜…抱抱我嘛","有点难过…","陪我一会儿好不好","唉…","🥺"],
+  kiss:["么么哒～","啾♡","mua～","亲一口就跑","💋"],
+};
+const PAT_BUBBLES = ["好舒服～","再摸摸嘛～","嘿嘿…🥰","呼噜呼噜～","轻一点啦～","被摸头了好开心"];
+const HUG_BUBBLES = ["抱抱～","好温暖！","紧紧抱住！","呜呜好感动","嘿嘿，抓到你了","贴贴～♡"];
+const PAT_COMBO_BUBBLES = ["又摸我！","摸上瘾了是吧！","你是摸头狂魔！"];
+
+function sayRandom(pool){
+  const arr=Array.isArray(pool)?pool:(BUBBLE_POOL[pool]||BUBBLE_POOL.neutral);
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+/* ---- 互动计数器 ---- */
+let patCount=0, lastPatTime=0, hugCount=0, lastInteractionTime=performance.now();
+
 /* ====================== DOM ====================== */
 const $ = id => document.getElementById(id);
 const video=$("cam"), overlay=$("overlay"), octx=overlay.getContext("2d");
@@ -599,6 +659,38 @@ let kissUntil=0, lastFaceLandmarks=null;
 let tplLiveDists={};       // 每条基准的实时距离
 const ALPHA=0.35, COMMIT_MS=260, MAX_MATCH_DIST=4.2;
 const LOCAL_KEY="kc-deskpet-v2";
+
+/* ====================== 音效系统 (Web Audio API) ====================== */
+const SoundFX = (()=>{
+  let ctx=null;
+  function ensure(){ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
+  function tone(freq,dur,type="sine",vol=.15,delay=0){
+    try{
+      const c=ensure(); const t=c.currentTime+delay;
+      const o=c.createOscillator(), g=c.createGain();
+      o.type=type; o.frequency.setValueAtTime(freq,t);
+      g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t+dur+.02);
+    }catch(e){}
+  }
+  return {
+    pat(){ tone(880,.12,"sine",.12); setTimeout(()=>tone(1100,.1,"sine",.1),60); },
+    hug(){
+      tone(523,.15,"sine",.1);
+      setTimeout(()=>tone(659,.15,"sine",.1),100);
+      setTimeout(()=>tone(784,.2,"sine",.1),200);
+    },
+    kiss(){ tone(660,.08,"sine",.08); setTimeout(()=>tone(880,.12,"triangle",.1),50); },
+    wave(){ tone(440,.06,"sine",.06); setTimeout(()=>tone(550,.06,"sine",.06),70); },
+    happy(){ tone(660,.1,"triangle",.08); setTimeout(()=>tone(880,.08,"sine",.08),80); },
+    surprise(){ tone(330,.06,"square",.04); setTimeout(()=>tone(550,.08,"sine",.06),50); },
+    sad(){ tone(330,.3,"sine",.06); },
+    angry(){ tone(150,.08,"sawtooth",.05); setTimeout(()=>tone(180,.08,"sawtooth",.05),60); },
+    idle(){ tone(440,.06,"sine",.04); },
+    click(){ tone(1000,.02,"sine",.05); },
+  };
+})();
 
 /* ====================== 工具 ====================== */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -872,7 +964,7 @@ const ps=(x,y,c)=>{if(c!==PAL.trans){pctx.fillStyle=c;pctx.fillRect(x,y,1,1);}};
 const pr=(x,y,w,h,c)=>{pctx.fillStyle=c;pctx.fillRect(x,y,w,h);};
 const ph=(y,x1,x2,c)=>{pctx.fillStyle=c;pctx.fillRect(x1,y,x2-x1+1,1);};
 
-let petFrame=0, petMood="neutral", petBlinkT=0;
+let petFrame=0, petMood="neutral", petBlinkT=0, petExtra=null;
 function tickPetFrame(){ petFrame++; }
 
 // --- 在原生分辨率下画椭圆（无抗锯齿） ---
@@ -1179,18 +1271,36 @@ function drawExtras(mood, offsY){
 function drawPixelPet(mood, frame){
   pctx.clearRect(0,0,56,66);
   const offsY = mood==="sad"?1:0; // 难过时略下沉
+  // 拥抱暖光
+  if(petExtra==="hug"){
+    for(let i=0;i<6;i++){
+      const gx=24+Math.floor(Math.cos(frame*0.4+i*1.05)*20);
+      const gy=30+Math.floor(Math.sin(frame*0.4+i*1.05)*16);
+      ps(gx,gy+offsY,"#ffe0c0"); ps(gx+1,gy+offsY,"#fff0e0");
+      ps(gx-1,gy+offsY,"#ffd0a0");
+    }
+  }
   drawEars(offsY);
   drawSprout(offsY);
   drawBody(offsY);
   drawFeet(offsY);
   drawExtras(mood,offsY);
   drawEyes(mood,offsY);
+  // 摸头深层脸红
+  if(petExtra==="pat"){
+    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(14+dx,35+dy+offsY,"#ff9080"); }
+    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(42+dx,35+dy+offsY,"#ff9080"); }
+    // 额头小闪光
+    const sx=28+Math.round(Math.sin(frame*0.5)*3), sy=8+offsY;
+    ps(sx,sy,"#fff"); ps(sx+2,sy+1,"#ffc24a");
+  }
   drawBlush(mood,offsY);
   drawMouth(mood,offsY);
 }
 
 // --- 表情切换 & 动画 ---
 let petRenderTid=null;
+let idleBubbleShown=false, idleYawned=false;
 function petRenderLoop(){
   tickPetFrame();
   // 眨眼计时
@@ -1199,6 +1309,18 @@ function petRenderLoop(){
     if(petBlinkT<=0){ petBlinkT=0; }
   }else if(Math.random()<0.008){ // 约每 4 秒眨眼
     petBlinkT=4; // 闭眼 4 帧
+  }
+  // 闲时行为
+  const idleTime = performance.now()-lastInteractionTime;
+  if(idleTime>30000){ // 30s: 偶尔打哈欠表情
+    if(!idleYawned && Math.random()<0.003){ idleYawned=true; petBlinkT=8; say("zzZ…好困呀"); SoundFX.idle(); setTimeout(()=>{idleYawned=false;},8000); }
+  }
+  if(idleTime>15000 && !idleBubbleShown && Math.random()<0.005){ // 15s: "?" 气泡
+    idleBubbleShown=true; say("?"); setTimeout(()=>{idleBubbleShown=false;},6000);
+  }
+  if(idleTime>5000 && Math.random()<0.006 && !petEl.classList.contains("idle-tilt")){ // 5s: 歪头
+    petEl.classList.add("idle-tilt");
+    setTimeout(()=>petEl.classList.remove("idle-tilt"),900);
   }
   drawPixelPet(petMood, petFrame);
   petRenderTid=requestAnimationFrame(petRenderLoop);
@@ -1239,13 +1361,19 @@ function spawnEmojis(list){
   });
 }
 function applyReaction(tpl, burst){
+  lastInteractionTime=performance.now();
   applyMood(tpl.mood);
   applyGif(tpl.gifUrl||null);
-  say(tpl.bubble);
+  const bubbleText=tpl.bubble||sayRandom(tpl.mood);
+  say(bubbleText);
   spawnEmojis(tpl.emojis);
   tipIcon.textContent=MOOD_EMOJI[tpl.mood]||"🙂"; tipText.textContent="识别到："+tpl.name;
   if(burst && tpl.particle && tpl.particle!=="none"){
     const c=petCenter(); FX.burst(tpl.particle, c.x, c.y-stage.clientHeight*0.04, {});
+  }
+  // 表情音效
+  if(burst){
+    const snd=tpl.mood; if(SoundFX[snd]) SoundFX[snd]();
   }
 }
 function petCenter(){
@@ -1258,40 +1386,164 @@ function syncShadow(){
   floorShadow.style.transform="translateX(-50%) scale("+(small?0.9:1)+",1)";
 }
 
-/* ====================== 手部：飞吻逻辑 ====================== */
+/* ====================== 手部：多手势检测 ====================== */
 const KISS_NEAR=0.14, KISS_FAR=0.26, KISS_WINDOW=950, KISS_COOLDOWN=1800;
+const PAT_Y_THRESH=0.06, PAT_DOWN_DIST=0.025, PAT_COOLDOWN=2000, PAT_WINDOW=1200;
+const HUG_DIST_THRESH=0.12, HUG_COOLDOWN=3500;
+const WAVE_DIST_THRESH=0.10, WAVE_SPEED=0.02, WAVE_COOLDOWN=2500;
+
 let kissState="idle", kissArmT=0, kissMinD=9, lastKissTrig=0;
+let patState="idle", patMinY=9, patArmT=0, lastPatTrig=0;
+let hugState="idle", hugApproachT=0, lastHugTrig=0;
+let waveState="idle", waveDir=0, waveSwitches=0, waveLastX=0, waveCheckT=0, lastWaveTrig=0;
+
+function handCenter(h){ let cx=0,cy=0; for(const i of HAND_TIPS){ cx+=h[i].x; cy+=h[i].y; } return {x:cx/HAND_TIPS.length,y:cy/HAND_TIPS.length}; }
+
 function processHand(res){
   const hands=res.landmarks||[];
   const present=hands.length>0;
   handBadge.classList.toggle("on", present);
-  if(!present || !lastFaceLandmarks){ kissState="idle"; return; }
+  if(!present || !lastFaceLandmarks){ kissState="idle"; patState="idle"; hugState="idle"; waveState="idle"; return; }
 
   const fc = lastFaceLandmarks;
-  const mouth = mid(fc[MOUTH.top], fc[MOUTH.bottom]);
-  let bestD=Infinity, bestP=null;
-  for(const h of hands){
-    let cx=0,cy=0; for(const i of HAND_TIPS){ cx+=h[i].x; cy+=h[i].y; }
-    const p={x:cx/HAND_TIPS.length,y:cy/HAND_TIPS.length};
-    const d=dist(p,mouth); if(d<bestD){bestD=d;bestP=p;}
-  }
   const now=performance.now();
-  if(now-lastKissTrig < KISS_COOLDOWN){ return; }
 
-  if(kissState==="idle"){
-    if(bestD<KISS_NEAR){ kissState="armed"; kissArmT=now; kissMinD=bestD; }
-  }else if(kissState==="armed"){
-    kissMinD=Math.min(kissMinD,bestD);
-    if(now-kissArmT>1400){ kissState="idle"; return; }
-    if(bestD>KISS_FAR && kissMinD<KISS_NEAR && (now-kissArmT)<KISS_WINDOW+700){
-      triggerKiss(bestP, mouth); kissState="idle"; lastKissTrig=now;
+  // 嘴部（飞吻用）
+  const mouth = mid(fc[MOUTH.top], fc[MOUTH.bottom]);
+  // 额头（摸头用）
+  const forehead = mid(fc[10], fc[9]||fc[10]); // landmark #10 = 额头
+  const foreheadY = (fc[10]?.y||fc[9]?.y||fc[107]?.y||0.2);
+  // 左/右眼中心（挥手参考）
+  const eyeL = mid(fc[EYEC.lOut], fc[EYEC.lIn]);
+  const eyeR = mid(fc[EYEC.rIn], fc[EYEC.rOut]);
+  const faceMidY = (eyeL.y+eyeR.y)/2;
+
+  // 找最近手
+  let bestD=Infinity, bestP=null, bestH=null;
+  for(const h of hands){
+    const p=handCenter(h); const d=dist(p,mouth);
+    if(d<bestD){bestD=d;bestP=p;bestH=h;}
+  }
+
+  // ====== 1. 飞吻检测 ======
+  if(now-lastKissTrig > KISS_COOLDOWN){
+    if(kissState==="idle"){
+      if(bestD<KISS_NEAR){ kissState="armed"; kissArmT=now; kissMinD=bestD; }
+    }else if(kissState==="armed"){
+      kissMinD=Math.min(kissMinD,bestD);
+      if(now-kissArmT>1400){ kissState="idle"; }
+      else if(bestD>KISS_FAR && kissMinD<KISS_NEAR && (now-kissArmT)<KISS_WINDOW+700){
+        triggerKiss(bestP, mouth); kissState="idle"; lastKissTrig=now; return;
+      }
+    }
+  }
+
+  // ====== 2. 摸头检测 ======
+  if(now-lastPatTrig > PAT_COOLDOWN && bestP){
+    const handAboveHead = bestP.y < foreheadY + PAT_Y_THRESH;
+    const handNearX = Math.abs(bestP.x - forehead.x) < 0.22;
+    if(patState==="idle"){
+      if(handAboveHead && handNearX){ patState="armed"; patArmT=now; patMinY=bestP.y; }
+    }else if(patState==="armed"){
+      if(now-patArmT > PAT_WINDOW){ patState="idle"; }
+      else{
+        patMinY=Math.min(patMinY, bestP.y);
+        // 手向下移动超过阈值 → 触发
+        if(bestP.y - patMinY > PAT_DOWN_DIST && handNearX){
+          triggerPat(bestP); patState="idle"; lastPatTrig=now; return;
+        }
+      }
+    }
+  }
+
+  // ====== 3. 拥抱检测 ======
+  if(now-lastHugTrig > HUG_COOLDOWN && hands.length>=2){
+    const p1=handCenter(hands[0]), p2=handCenter(hands[1]);
+    const hDist=dist(p1,p2);
+    // 双手靠近 + 在脸下方胸前区域
+    const bothBelowFace = p1.y>faceMidY && p2.y>faceMidY;
+    const bothInFront = Math.abs(p1.x-forehead.x)<0.3 && Math.abs(p2.x-forehead.x)<0.3;
+    if(hugState==="idle"){
+      if(hDist<HUG_DIST_THRESH*2 && bothBelowFace){ hugState="approaching"; hugApproachT=now; }
+    }else if(hugState==="approaching"){
+      if(hDist<HUG_DIST_THRESH && bothInFront){
+        triggerHug(mid(p1,p2)); hugState="idle"; lastHugTrig=now; return;
+      }
+      if(now-hugApproachT>2000){ hugState="idle"; }
+    }
+  }
+
+  // ====== 4. 挥手检测 ======
+  if(now-lastWaveTrig > WAVE_COOLDOWN && bestP){
+    const handX=bestP.x;
+    if(waveState==="idle"){
+      waveLastX=handX; waveSwitches=0; waveDir=0; waveState="watching"; waveCheckT=now;
+    }else if(waveState==="watching"){
+      const dx=handX-waveLastX;
+      if(Math.abs(dx)>WAVE_DIST_THRESH){
+        const newDir=dx>0?1:-1;
+        if(newDir!==waveDir){ waveSwitches++; waveDir=newDir; }
+        waveLastX=handX;
+      }
+      if(waveSwitches>=3 && now-waveCheckT<800){ triggerWave(); waveState="idle"; lastWaveTrig=now; return; }
+      if(now-waveCheckT>1600){ waveState="idle"; }
     }
   }
 }
+
+/* ---- 摸头触发 ---- */
+function triggerPat(handP){
+  lastInteractionTime=performance.now();
+  patCount++; if(performance.now()-lastPatTime>3000) patCount=1;
+  lastPatTime=performance.now();
+  petExtra="pat";
+  setTimeout(()=>{ if(petExtra==="pat") petExtra=null; }, 1800);
+  // 气泡
+  const bubble = patCount>=4?PAT_COMBO_BUBBLES[Math.floor(Math.random()*PAT_COMBO_BUBBLES.length)]:sayRandom(PAT_BUBBLES);
+  say(bubble);
+  spawnEmojis("🥰💕✨");
+  tipIcon.textContent="✋"; tipText.textContent="摸摸头～"+(patCount>=3?" x"+patCount:"");
+  const c=petCenter();
+  FX.burst("patSpark", c.x, c.y-20, {count:16});
+  SoundFX.pat();
+  // 屏幕微震
+  stage.classList.add("shake"); setTimeout(()=>stage.classList.remove("shake"),350);
+}
+
+/* ---- 拥抱触发 ---- */
+function triggerHug(midP){
+  lastInteractionTime=performance.now();
+  hugCount++; petExtra="hug";
+  setTimeout(()=>{ if(petExtra==="hug") petExtra=null; }, 2200);
+  say(sayRandom(HUG_BUBBLES));
+  spawnEmojis("🤗💗💝💕");
+  tipIcon.textContent="🤗"; tipText.textContent="抱抱～";
+  const c=petCenter();
+  FX.burst("warmGlow", c.x, c.y-5, {count:22, big:true});
+  FX.burst("heart", c.x, c.y-10, {count:14});
+  SoundFX.hug();
+  stage.classList.add("shake"); setTimeout(()=>stage.classList.remove("shake"),350);
+}
+
+/* ---- 挥手触发 ---- */
+function triggerWave(){
+  lastInteractionTime=performance.now();
+  petEl.classList.add("waving");
+  setTimeout(()=>petEl.classList.remove("waving"), 900);
+  say("嗨～你好呀！👋");
+  spawnEmojis("👋✨⭐");
+  tipIcon.textContent="👋"; tipText.textContent="挥手回应～";
+  const c=petCenter();
+  FX.burst("star", c.x, c.y-30, {count:10, big:false});
+  SoundFX.wave();
+}
+
+/* ---- 飞吻触发（增强） ---- */
 function triggerKiss(handP, mouthP){
+  lastInteractionTime=performance.now();
   kissUntil=performance.now()+2200;
   applyMood("kiss"); applyGif(null);
-  say("么么哒～ 啾♡");
+  say(sayRandom("kiss"));
   spawnEmojis("😘💋💕");
   tipIcon.textContent="💋"; tipText.textContent="收到飞吻！";
   const cx=petCenter().x, cy=petCenter().y;
@@ -1301,6 +1553,7 @@ function triggerKiss(handP, mouthP){
   el.style.setProperty("--dx",((handP.x<mouthP.x?-1:1)*120)+"px");
   el.style.setProperty("--dr","0deg");
   emojiLayer.appendChild(el); el.addEventListener("animationend",()=>el.remove());
+  SoundFX.kiss();
   setTimeout(()=>{
     if(performance.now()>=kissUntil){
       if(currentTpl) applyReaction(currentTpl,false); else applyMood("neutral");
@@ -1319,6 +1572,8 @@ const FX = (()=>{
     tear:   {n:12,life:[0.7,1.2],sp:[30,90],grav:380,col:["#6fb8e8","#9fd0f2"],kind:"drop",size:[5,9]},
     anger:  {n:14,life:[0.5,0.9],sp:[120,260],grav:60,col:["#ff4d4d","#ff7a3c","#ff3b3b"],kind:"spark",size:[4,9]},
     confetti:{n:30,life:[1.0,1.8],sp:[120,300],grav:240,col:["#ff6f5e","#1fb9a3","#ffc24a","#6fb8e8","#ff8aa0"],kind:"rect",size:[5,11]},
+    patSpark:{n:16,life:[0.5,1.0],sp:[30,140],grav:-50,col:["#ffb3a8","#fff","#ffc24a","#ffe48a"],kind:"star",size:[4,10]},
+    warmGlow:{n:22,life:[0.6,1.3],sp:[20,80],grav:-20,col:["#ffe0c0","#ffd0a0","#fff0e0","#ffc090"],kind:"glow",size:[4,12]},
   };
   function burst(type,x,y,opts={}){
     const p=PRESETS_FX[type]; if(!p) return;
@@ -1375,6 +1630,7 @@ const FX = (()=>{
       else if(q.kind==="heart"){ heart(fctx,q.x,q.y,q.size,q.rot*0.4,q.col); }
       else if(q.kind==="drop"){ drop(fctx,q.x,q.y,q.size,q.col); }
       else if(q.kind==="rect"){ fctx.save(); fctx.translate(q.x,q.y); fctx.rotate(q.rot); fctx.fillStyle=q.col; fctx.fillRect(-q.size/2,-q.size/4,q.size,q.size/2); fctx.restore(); }
+      else if(q.kind==="glow"){ fctx.save(); fctx.translate(q.x,q.y); const g=fctx.createRadialGradient(0,0,0,0,0,q.size); g.addColorStop(0,q.col); g.addColorStop(1,"transparent"); fctx.fillStyle=g; fctx.beginPath(); fctx.arc(0,0,q.size,0,7); fctx.fill(); fctx.restore(); }
       else {
         fctx.save(); fctx.translate(q.x,q.y); fctx.rotate(q.rot); fctx.strokeStyle=q.col; fctx.lineWidth=Math.max(2,q.size/3); fctx.lineCap="round";
         fctx.beginPath(); fctx.moveTo(-q.size,0); fctx.lineTo(q.size,0); fctx.stroke(); fctx.restore();
@@ -1747,6 +2003,7 @@ function resetAll(){
   templates=[]; calibOffset=null; calibScale=1;
   currentLabel=null; currentTpl=null; selectedId=null; smoothVec=null;
   invStd=null; pending=null;
+  patCount=0; hugCount=0; lastInteractionTime=performance.now();
   $("editor").classList.remove("show");
   applyMood("neutral"); applyGif(null);
   recomputeStd(); renderTpls(); updateCalibInfo(); saveAll();
