@@ -1,0 +1,1842 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>小克 · 表情桌宠</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ====================== 主题 / Theme ====================== */
+:root{
+  --bg:#f7efe0; --bg-2:#f0e4cf;
+  --ink:#2d2722; --ink-soft:#7a6e60; --ink-faint:#a99c89;
+  --card:#fffdf8; --card-2:#fbf5e9; --line:#e8ddc6; --line-2:#f0e7d6;
+  --coral:#ff6f5e; --coral-d:#e6543f; --coral-soft:#ffe6e0;
+  --mint:#1fb9a3; --mint-d:#178d7c; --mint-soft:#d8f3ee;
+  --sun:#ffc24a; --sun-soft:#fff0cf;
+  --sky:#6fb8e8;
+  --shadow:74 55 30;
+  --r-lg:24px; --r-md:16px; --r-sm:11px;
+  --maxw:1340px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Nunito","PingFang SC","Microsoft YaHei",-apple-system,system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 78% -10%, var(--sun-soft) 0%, transparent 55%),
+    radial-gradient(900px 600px at 12% 110%, var(--mint-soft) 0%, transparent 55%),
+    linear-gradient(168deg, var(--bg) 0%, var(--bg-2) 100%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+  min-height:100%;
+  position:relative;
+}
+/* 点阵纹理 + 颗粒 overlay */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:radial-gradient(rgba(120,95,55,.10) 1.1px, transparent 1.2px);
+  background-size:22px 22px; opacity:.5;
+}
+body::after{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.05; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap{position:relative; z-index:1; max-width:var(--maxw); margin:0 auto; padding:22px 22px 48px;}
+
+/* ====================== Header ====================== */
+header{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.brand{display:flex; align-items:center; gap:13px;}
+.brand .mark{
+  width:50px; height:50px; border-radius:15px; flex:none;
+  background:linear-gradient(150deg, var(--mint) 0%, #36ccb4 100%);
+  box-shadow:0 8px 18px -6px rgba(31,185,163,.6), inset 0 -3px 0 rgba(0,0,0,.08);
+  display:grid; place-items:center; position:relative; overflow:hidden;
+}
+.brand .mark svg{width:36px;height:36px}
+.brand h1{
+  font-family:"Fredoka",sans-serif; font-weight:600; font-size:30px; margin:0; letter-spacing:.5px; line-height:1;
+}
+.brand p{margin:3px 0 0; font-size:12.5px; color:var(--ink-soft); font-weight:600}
+.spacer{flex:1}
+.stats{display:flex; gap:9px; flex-wrap:wrap;}
+.chip{
+  font-family:"Space Mono",monospace; font-size:12px; font-weight:700;
+  background:var(--card); border:1.5px solid var(--line); border-radius:999px;
+  padding:7px 13px; display:flex; align-items:center; gap:7px; color:var(--ink-soft);
+  box-shadow:0 4px 10px -7px rgba(var(--shadow),.5);
+}
+.chip b{color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%; background:var(--ink-faint); flex:none; box-shadow:0 0 0 0 rgba(31,185,163,.5);}
+.dot.ok{background:var(--mint); animation:pulse 2s infinite}
+.dot.busy{background:var(--sun); animation:pulse 1s infinite}
+.dot.err{background:var(--coral)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(31,185,163,.55)}70%{box-shadow:0 0 0 7px rgba(31,185,163,0)}100%{box-shadow:0 0 0 0 rgba(31,185,163,0)}}
+
+/* ====================== Layout ====================== */
+.grid{display:grid; grid-template-columns:1fr 384px; gap:20px; align-items:start;}
+@media (max-width:1080px){ .grid{grid-template-columns:1fr} }
+
+.card{
+  background:var(--card); border:1.5px solid var(--line); border-radius:var(--r-lg);
+  box-shadow:0 18px 40px -22px rgba(var(--shadow),.55), 0 2px 0 rgba(255,255,255,.7) inset;
+  padding:18px;
+}
+.card h2{
+  font-family:"Fredoka",sans-serif; font-weight:600; font-size:16px; margin:0 0 14px;
+  display:flex; align-items:center; gap:9px; letter-spacing:.3px;
+}
+.card h2 .ic{width:26px;height:26px;border-radius:9px; display:grid; place-items:center; flex:none; color:#fff;}
+.ic.cor{background:var(--coral)} .ic.min{background:var(--mint)} .ic.sun{background:var(--sun)} .ic.sky{background:var(--sky)}
+.rail{display:flex; flex-direction:column; gap:16px;}
+
+/* ====================== Stage / 桌宠舞台 ====================== */
+.stage-card{padding:0; overflow:hidden; position:relative;}
+.stage{
+  position:relative; aspect-ratio:1/1; min-height:380px; max-height:72vh;
+  background:
+    radial-gradient(120% 80% at 50% 8%, #fffefb 0%, #fbf3e2 45%, #f1e3c8 100%);
+  overflow:hidden;
+}
+/* 像素网格叠加（仅在舞台） */
+.stage::before{
+  content:""; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.06;
+  background-image:
+    linear-gradient(rgba(45,39,34,.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,39,34,.3) 1px, transparent 1px);
+  background-size:12px 12px;
+}
+.stage::after{ /* vignette */
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  box-shadow:inset 0 -60px 90px -50px rgba(120,90,40,.35), inset 0 40px 80px -60px rgba(255,255,255,.9);
+}
+.shelf{ /* 桌面横线 */
+  position:absolute; left:0; right:0; bottom:21%; height:2px;
+  background:linear-gradient(90deg, transparent, rgba(120,90,40,.18) 18%, rgba(120,90,40,.18) 82%, transparent);
+}
+#fx{position:absolute; inset:0; z-index:6; pointer-events:none;}
+.pet-stack{position:absolute; left:50%; top:48%; transform:translate(-50%,-50%); z-index:4; width:min(58%,330px);}
+.floor-shadow{
+  position:absolute; left:50%; bottom:-26%; transform:translateX(-50%);
+  width:62%; height:13%; border-radius:50%;
+  background:radial-gradient(closest-side, rgba(90,65,30,.32), transparent 78%);
+  z-index:-1; transition:transform .2s, opacity .2s;
+}
+/* ===== 像素小克 ===== */
+#pet{position:relative; width:100%; will-change:transform; transform-origin:center bottom;}
+.pet-canvas-wrap{position:relative; width:100%;}
+#petCanvas{
+  display:block; width:100%; height:auto;
+  image-rendering:pixelated; image-rendering:crisp-edges;
+  /* native 56x66 scaled up via CSS width:100% */
+}
+#pet .kc-gif{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+  display:none; border-radius:18px; image-rendering:auto;
+}
+#pet.has-gif .pet-canvas-wrap{display:none}
+#pet.has-gif .kc-gif{display:block}
+
+/* 身体动作 — 保留在 #pet 层级 */
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.975)}}
+@keyframes bounce{0%,100%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-8%) scale(.97,1.05)}60%{transform:translateY(2%) scale(1.04,.94)}}
+@keyframes hop{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-15%) scale(1.06,1.04)}100%{transform:translateY(0) scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-3%)}30%{transform:translateX(3%)}45%{transform:translateX(-2%)}60%{transform:translateX(2%)}75%{transform:translateX(-1%)}90%{transform:translateX(1%)}}
+@keyframes droop{0%,100%{transform:translateY(0)}50%{transform:translateY(3.5%)}}
+@keyframes thump{0%,100%{transform:scale(1)}30%{transform:scale(1.06,.94)}60%{transform:scale(.96,1.03)}}
+#pet{animation:breathe 3.6s ease-in-out infinite}
+#pet.mood-happy{animation:bounce .62s ease-in-out infinite}
+#pet.mood-surprise{animation:hop .5s cubic-bezier(.3,1.6,.5,1)}
+#pet.mood-angry{animation:shake .34s ease-in-out infinite}
+#pet.mood-sad{animation:droop 3s ease-in-out infinite}
+#pet.mood-kiss{animation:thump .7s ease-in-out infinite}
+
+/* 气泡 */
+#bubble{
+  position:absolute; left:50%; top:8%; transform:translate(-50%,8px) scale(.7);
+  z-index:7; max-width:74%; pointer-events:none; opacity:0;
+  transition:transform .28s cubic-bezier(.2,1.5,.4,1), opacity .2s;
+}
+#bubble.show{opacity:1; transform:translate(-50%,0) scale(1);}
+.bubble-inner{
+  background:#fff; color:var(--ink); border:2px solid var(--ink);
+  font-weight:800; font-size:clamp(13px,1.6vw,17px); line-height:1.35;
+  padding:11px 16px; border-radius:18px; text-align:center;
+  box-shadow:5px 6px 0 rgba(45,39,34,.16); position:relative;
+}
+.bubble-inner::after{
+  content:""; position:absolute; left:50%; bottom:-12px; transform:translateX(-50%) rotate(45deg);
+  width:18px;height:18px; background:#fff; border-right:2px solid var(--ink); border-bottom:2px solid var(--ink);
+}
+#emojiLayer{position:absolute; inset:0; z-index:5; pointer-events:none; overflow:hidden;}
+.fl-emoji{position:absolute; font-size:30px; animation:floatUp 1.6s ease-out forwards; filter:drop-shadow(0 4px 5px rgba(0,0,0,.18));}
+@keyframes floatUp{0%{opacity:0; transform:translate(0,12px) scale(.3) rotate(0)}18%{opacity:1}100%{opacity:0; transform:translate(var(--dx,0),-120px) scale(1.15) rotate(var(--dr,0))}}
+
+.stage-tip{
+  position:absolute; left:14px; bottom:13px; z-index:7; font-size:12px; font-weight:700;
+  color:var(--ink-soft); background:rgba(255,253,248,.82); border:1.5px solid var(--line);
+  padding:6px 11px; border-radius:999px; backdrop-filter:blur(4px); display:flex; gap:7px; align-items:center;
+}
+.curexpr{
+  position:absolute; right:14px; top:14px; z-index:7;
+  background:rgba(255,253,248,.9); border:1.5px solid var(--line); border-radius:14px;
+  padding:9px 13px; backdrop-filter:blur(4px); box-shadow:0 8px 18px -12px rgba(var(--shadow),.6);
+  text-align:right; min-width:120px;
+}
+.curexpr .lab{font-size:10.5px; font-weight:800; color:var(--ink-faint); letter-spacing:1px; text-transform:uppercase;}
+.curexpr .val{font-family:"Fredoka",sans-serif; font-size:21px; font-weight:600; line-height:1.1; color:var(--mint-d);}
+.curexpr .sub{font-family:"Space Mono",monospace; font-size:11px; color:var(--ink-soft); margin-top:2px;}
+
+/* ====================== 摄像头 ====================== */
+.cam-wrap{position:relative; border-radius:var(--r-md); overflow:hidden; background:#1c1814; aspect-ratio:4/3;}
+#cam{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+#overlay{position:absolute; inset:0; width:100%; height:100%; touch-action:none;}
+#overlay.calib{cursor:grab}
+#overlay.calib:active{cursor:grabbing}
+.cam-badge{
+  position:absolute; left:9px; top:9px; z-index:3; font-family:"Space Mono",monospace;
+  font-size:11px; font-weight:700; color:#fff; background:rgba(20,16,12,.55);
+  padding:4px 9px; border-radius:999px; display:flex; align-items:center; gap:6px; backdrop-filter:blur(3px);
+}
+.cam-badge .d{width:7px;height:7px;border-radius:50%; background:#7a7066}
+.cam-badge.on .d{background:#36ccb4}
+.hand-badge{position:absolute; right:9px; top:9px; z-index:3;}
+.calib-banner{
+  position:absolute; left:0; right:0; bottom:0; z-index:3; background:rgba(255,111,94,.92);
+  color:#fff; font-weight:800; font-size:12px; padding:8px 11px; display:none; align-items:center; gap:8px;
+}
+#overlay.calib ~ .calib-banner{display:flex}
+.cam-empty{
+  position:absolute; inset:0; display:grid; place-items:center; text-align:center; color:#cdbfa9;
+  font-weight:700; font-size:13px; padding:20px; z-index:2;
+}
+.row{display:flex; gap:9px; flex-wrap:wrap; margin-top:13px;}
+
+/* 按钮 */
+button{font-family:inherit; cursor:pointer;}
+.btn{
+  border:1.5px solid var(--line); background:var(--card-2); color:var(--ink);
+  font-weight:800; font-size:13px; padding:9px 14px; border-radius:11px;
+  transition:transform .08s, box-shadow .15s, background .15s, border-color .15s; display:inline-flex; align-items:center; gap:7px;
+  box-shadow:0 3px 0 var(--line);
+}
+.btn:hover{transform:translateY(-1px); box-shadow:0 5px 0 var(--line)}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--coral); color:#fff; border-color:var(--coral-d); box-shadow:0 3px 0 var(--coral-d)}
+.btn.primary:hover{box-shadow:0 5px 0 var(--coral-d); background:#ff7e6e}
+.btn.primary:active{box-shadow:0 1px 0 var(--coral-d)}
+.btn.mint{background:var(--mint); color:#fff; border-color:var(--mint-d); box-shadow:0 3px 0 var(--mint-d)}
+.btn.mint:hover{box-shadow:0 5px 0 var(--mint-d)}
+.btn.mint:active{box-shadow:0 1px 0 var(--mint-d)}
+.btn.ghost{background:transparent; box-shadow:none; border-style:dashed;}
+.btn.ghost:hover{box-shadow:none; background:var(--card-2)}
+.btn.sm{padding:6px 10px; font-size:12px; box-shadow:0 2px 0 var(--line)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none!important}
+
+.toggle{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; user-select:none;}
+.toggle input{display:none}
+.sw{width:38px;height:22px;border-radius:999px;background:var(--line); position:relative; transition:background .2s; flex:none;}
+.sw::after{content:""; position:absolute; top:2px; left:2px; width:18px;height:18px;border-radius:50%;background:#fff; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked + .sw{background:var(--mint)}
+.toggle input:checked + .sw::after{transform:translateX(16px)}
+
+/* ====================== 实时特征条 ====================== */
+.metric{margin-bottom:11px}
+.metric:last-child{margin-bottom:0}
+.metric .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px}
+.metric .name{font-size:12.5px; font-weight:800; color:var(--ink-soft)}
+.metric .num{font-family:"Space Mono",monospace; font-size:13px; font-weight:700; color:var(--ink)}
+.track{height:9px; border-radius:999px; background:var(--line-2); overflow:hidden; position:relative;}
+.fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--mint),#41d3bd); width:0%; transition:width .12s linear;}
+.metric.signed .track{background:var(--line-2)}
+.metric.signed .fill{position:absolute; left:50%; background:linear-gradient(90deg,var(--coral),#ff9384);}
+.metric.signed .track::before{content:""; position:absolute; left:50%; top:-2px; bottom:-2px; width:2px; background:var(--ink-faint); transform:translateX(-50%); z-index:2;}
+
+/* ====================== 表情基准 ====================== */
+.presets{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}
+.preset{
+  border:1.5px solid var(--line); background:var(--card-2); border-radius:999px; padding:6px 11px 6px 8px;
+  font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 0 var(--line);
+  cursor:pointer; user-select:none; transition:transform .08s, background .15s;
+}
+.preset:hover{transform:translateY(-1px)}
+.preset:active{transform:translateY(2px); box-shadow:0 1px 0 var(--line)}
+.preset.recording{background:var(--coral-soft); border-color:var(--coral); animation:recPulse .35s ease-in-out infinite}
+@keyframes recPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.preset .e{font-size:15px}
+.nameline{display:flex; gap:8px; margin-bottom:12px;}
+.nameline input{
+  flex:1; min-width:0; font-family:inherit; font-weight:700; font-size:13px;
+  border:1.5px solid var(--line); border-radius:11px; padding:9px 12px; background:#fff; color:var(--ink);
+}
+.nameline input:focus{outline:none; border-color:var(--mint)}
+.tpls{display:flex; flex-direction:column; gap:8px;}
+.tpl{
+  display:flex; align-items:center; gap:10px; padding:9px 11px; border:1.5px solid var(--line);
+  border-radius:13px; background:var(--card-2); cursor:pointer; transition:border-color .15s, background .15s, transform .08s;
+}
+.tpl:hover{transform:translateX(2px)}
+.tpl.sel{border-color:var(--mint); background:var(--mint-soft); box-shadow:0 0 0 3px rgba(31,185,163,.12)}
+.tpl.active{border-color:var(--coral); background:var(--coral-soft);}
+.tpl .face-mini{width:34px;height:34px;border-radius:10px; display:grid; place-items:center; font-size:20px; background:#fff; border:1.5px solid var(--line); flex:none;}
+.tpl .meta{flex:1; min-width:0}
+.tpl .meta .nm{font-weight:800; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tpl .meta .ds{font-family:"Space Mono",monospace; font-size:10.5px; color:var(--ink-faint)}
+.tpl .live{font-family:"Space Mono",monospace; font-size:11px; font-weight:700; color:var(--mint-d); flex:none}
+.empty-hint{font-size:12.5px; color:var(--ink-faint); font-weight:700; text-align:center; padding:14px 8px; line-height:1.6;}
+
+/* 编辑器 */
+.editor{margin-top:13px; padding-top:14px; border-top:1.5px dashed var(--line); display:none;}
+.editor.show{display:block}
+.ed-grid{display:grid; grid-template-columns:auto 1fr; gap:9px 11px; align-items:center;}
+.ed-grid label{font-size:12px; font-weight:800; color:var(--ink-soft)}
+.ed-grid input[type=text], .ed-grid select{
+  font-family:inherit; font-weight:700; font-size:12.5px; border:1.5px solid var(--line);
+  border-radius:9px; padding:7px 10px; background:#fff; color:var(--ink); width:100%;
+}
+.ed-grid input:focus, .ed-grid select:focus{outline:none; border-color:var(--mint)}
+.filebtn{position:relative; overflow:hidden}
+.gif-slot{display:flex; gap:8px; align-items:center}
+.gif-prev{width:38px;height:38px;border-radius:9px; border:1.5px solid var(--line); object-fit:cover; background:var(--card-2); display:none}
+.gif-prev.show{display:block}
+
+small.note{display:block; font-size:11px; color:var(--ink-faint); font-weight:600; line-height:1.5; margin-top:10px}
+
+/* 折叠说明 */
+details.help{margin-top:4px}
+details.help summary{cursor:pointer; font-weight:800; font-size:13px; color:var(--mint-d); list-style:none; display:flex; align-items:center; gap:7px;}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary .tri{transition:transform .2s}
+details.help[open] summary .tri{transform:rotate(90deg)}
+.help-body{font-size:12.5px; line-height:1.75; color:var(--ink-soft); margin-top:10px}
+.help-body b{color:var(--ink)}
+.help-body ol{margin:6px 0 0; padding-left:20px}
+.help-body li{margin-bottom:4px}
+
+/* 录制计数提示 */
+.rec-counter{
+  font-family:"Space Mono",monospace; font-size:12px; font-weight:700; color:var(--coral-d);
+  display:inline-flex; align-items:center; gap:5px; padding:4px 9px; background:var(--coral-soft);
+  border-radius:999px; animation:fadeIn .2s ease-out;
+}
+@keyframes fadeIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+/* Toast */
+#toast{
+  position:fixed; bottom:32px; left:50%; transform:translateX(-50%); z-index:100;
+  background:var(--ink); color:#fff; font-weight:800; font-size:13px;
+  padding:11px 20px; border-radius:999px; box-shadow:0 12px 30px -10px rgba(0,0,0,.5);
+  opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(-6px)}
+
+/* Fatal */
+#fatal{
+  position:fixed; inset:0; z-index:99; background:rgba(247,239,224,.94); backdrop-filter:blur(6px);
+  display:none; place-items:center; padding:24px;
+}
+#fatal .box{max-width:440px; background:#fff; border:2px solid var(--coral); border-radius:20px; padding:24px; box-shadow:0 20px 50px -20px rgba(var(--shadow),.7)}
+#fatal h3{font-family:"Fredoka",sans-serif; margin:0 0 10px; font-size:20px; color:var(--coral-d)}
+#fatal p{font-size:13.5px; line-height:1.7; color:var(--ink-soft); margin:0 0 8px}
+#fatal code{font-family:"Space Mono",monospace; background:var(--card-2); padding:2px 6px; border-radius:6px; font-size:12px}
+
+.reveal{opacity:0; transform:translateY(14px); animation:reveal .6s cubic-bezier(.2,.8,.3,1) forwards;}
+@keyframes reveal{to{opacity:1; transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="reveal" style="animation-delay:.02s">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="22" rx="14" ry="13.5" fill="#fff"/><circle cx="15" cy="20" r="2.4" fill="#2d2722"/><circle cx="25" cy="20" r="2.4" fill="#2d2722"/><path d="M16 26 Q20 29 24 26" stroke="#2d2722" stroke-width="2" stroke-linecap="round"/><path d="M20 8 Q23 3 27 6 Q24 9 20 8Z" fill="#36ccb4"/><circle cx="11" cy="24" r="2" fill="#ffb3a8"/><circle cx="29" cy="24" r="2" fill="#ffb3a8"/></svg>
+      </div>
+      <div>
+        <h1>小克 · 表情桌宠</h1>
+        <p>像素风 Pixel Pet · MediaPipe Face Mesh 实时表情驱动</p>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="stats">
+      <div class="chip"><span class="dot" id="modelDot"></span><span id="modelState">加载模型…</span></div>
+      <div class="chip">关键点 <b id="lmCount">—</b></div>
+      <div class="chip"><b id="fps">—</b> FPS</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ============ 舞台 ============ -->
+    <div class="card stage-card reveal" style="animation-delay:.08s">
+      <div class="stage" id="stage">
+        <div class="shelf"></div>
+        <div class="curexpr">
+          <div class="lab">当前表情</div>
+          <div class="val" id="curExpr">—</div>
+          <div class="sub" id="curSub">等待基准</div>
+        </div>
+        <div class="pet-stack">
+          <div class="floor-shadow" id="floorShadow"></div>
+          <div id="pet" class="mood-neutral">
+            <img class="kc-gif" id="petGif" alt="" />
+            <div class="pet-canvas-wrap">
+              <canvas id="petCanvas" width="56" height="66" aria-label="小克像素宠物"></canvas>
+            </div>
+          </div>
+        </div>
+        <div id="emojiLayer"></div>
+        <div id="bubble"><div class="bubble-inner" id="bubbleText">嗨～</div></div>
+        <canvas id="fx"></canvas>
+        <div class="stage-tip"><span id="tipIcon">👀</span><span id="tipText">允许摄像头后，对我做表情吧</span></div>
+      </div>
+    </div>
+
+    <!-- ============ 右侧控制栏 ============ -->
+    <div class="rail">
+      <!-- 摄像头 -->
+      <div class="card reveal" style="animation-delay:.14s">
+        <h2><span class="ic min">📷</span>摄像头 & 识别</h2>
+        <div class="cam-wrap">
+          <video id="cam" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div class="cam-badge" id="faceBadge"><span class="d"></span>人脸</div>
+          <div class="cam-badge hand-badge" id="handBadge"><span class="d"></span>手</div>
+          <div class="cam-empty" id="camEmpty">点击「开启摄像头」开始</div>
+          <div class="calib-banner">🎯 校准中：拖动关键点修正偏移 · 识别已暂停</div>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="startBtn">开启摄像头</button>
+          <label class="toggle"><input type="checkbox" id="showLm"><span class="sw"></span>显示关键点</label>
+        </div>
+      </div>
+
+      <!-- 实时特征 -->
+      <div class="card reveal" style="animation-delay:.2s">
+        <h2><span class="ic cor">📊</span>实时特征</h2>
+        <div id="metrics"></div>
+      </div>
+
+      <!-- 表情基准 -->
+      <div class="card reveal" style="animation-delay:.26s">
+        <h2><span class="ic sun">🎭</span>表情基准（最近邻）</h2>
+        <div class="presets" id="presets"></div>
+        <div class="nameline">
+          <input type="text" id="tplName" placeholder="自定义表情名，如「歪头杀」" maxlength="12"/>
+          <button class="btn mint" id="recordBtn" disabled>● 录制</button>
+        </div>
+        <div class="tpls" id="tpls"></div>
+        <!-- 反应编辑器 -->
+        <div class="editor" id="editor">
+          <div class="ed-grid">
+            <label>名称</label><input type="text" id="edName" maxlength="14"/>
+            <label>小克心情</label>
+            <select id="edMood">
+              <option value="neutral">😐 中性</option>
+              <option value="happy">😄 开心</option>
+              <option value="surprise">😮 惊讶</option>
+              <option value="angry">😠 生气</option>
+              <option value="sad">🥺 难过</option>
+              <option value="kiss">😘 亲亲</option>
+            </select>
+            <label>气泡台词</label><input type="text" id="edBubble" maxlength="24" placeholder="出现时说的话"/>
+            <label>特效 emoji</label><input type="text" id="edEmojis" placeholder="如 ✨💛😄"/>
+            <label>粒子效果</label>
+            <select id="edParticle">
+              <option value="none">无</option>
+              <option value="sparkle">✨ 闪光</option>
+              <option value="star">⭐ 星星爆发</option>
+              <option value="heart">💗 爱心</option>
+              <option value="tear">💧 泪滴</option>
+              <option value="anger">💢 怒气</option>
+              <option value="confetti">🎉 彩纸</option>
+            </select>
+            <label>替换 GIF</label>
+            <div class="gif-slot">
+              <img class="gif-prev" id="edGifPrev" alt=""/>
+              <label class="btn ghost sm" style="margin:0">选择 GIF…<input type="file" id="edGif" accept="image/gif,image/png,image/webp" hidden></label>
+              <button class="btn ghost sm" id="edGifClear" style="margin:0">清除</button>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn sm mint" id="edTest">▶ 预览反应</button>
+            <button class="btn sm" id="edDelete" style="margin-left:auto; color:var(--coral-d); border-color:var(--coral)">删除该基准</button>
+          </div>
+          <small class="note">GIF 用本地文件即时生效（不上传），用于把小克换成你自己的素材；导出数据时不含 GIF。</small>
+        </div>
+        <small class="note">建议先录一个「中性」，再录其它表情。识别用归一化欧氏距离做最近邻，并带时间去抖。</small>
+      </div>
+
+      <!-- 校准 -->
+      <div class="card reveal" style="animation-delay:.32s">
+        <h2><span class="ic sky">🎯</span>校准模式</h2>
+        <p style="font-size:12.5px; color:var(--ink-soft); font-weight:700; margin:0 0 12px; line-height:1.6">
+          冻结当前帧，把偏移的关键点<b>拖</b>到正确位置；偏移量会叠加到后续每帧（按脸部尺度自适应）。
+          <span style="color:var(--coral-d)">彩色点</span>为参与特征计算的关键点。
+        </p>
+        <div class="row">
+          <button class="btn mint" id="calibBtn" disabled>进入校准</button>
+          <button class="btn sm" id="recapBtn" disabled>重新捕获帧</button>
+          <button class="btn sm" id="resetCalibBtn" disabled>重置偏移</button>
+        </div>
+        <small class="note" id="calibInfo">偏移点：0 / 478</small>
+      </div>
+
+      <!-- 数据 -->
+      <div class="card reveal" style="animation-delay:.38s">
+        <h2><span class="ic cor">💾</span>数据 & 说明</h2>
+        <div class="row">
+          <button class="btn sm" id="exportBtn">导出基准</button>
+          <label class="btn sm ghost" style="margin:0">导入基准<input type="file" id="importFile" accept="application/json" hidden></label>
+          <button class="btn sm" id="resetAllBtn" style="color:var(--coral-d); border-color:var(--coral)">清空全部</button>
+        </div>
+        <details class="help" style="margin-top:14px">
+          <summary><span class="tri">▶</span>怎么玩？</summary>
+          <div class="help-body">
+            <ol>
+              <li><b>开启摄像头</b>，等模型加载完（顶部圆点变绿）。</li>
+              <li>对镜头做一个表情，点对应<b>预设</b>或填名字后<b>录制</b>，保持 0.6s。</li>
+              <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），小克就会实时跟着切换。</li>
+              <li><b>飞吻</b>：把手靠近嘴边再向外推开 → 触发爱心。（独立于表情识别）</li>
+              <li>点某条基准可<b>编辑</b>它的心情 / 台词 / emoji / 粒子 / GIF。</li>
+              <li>关键点有偏移就进<b>校准模式</b>拖一拖。</li>
+            </ol>
+          </div>
+        </details>
+        <small class="note">所有数据存在本机浏览器（localStorage），刷新仍在。需要摄像头权限；若打不开摄像头，请用本地服务器或 https 打开本页。</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- 致命错误 -->
+<div id="fatal"><div class="box">
+  <h3 id="fatalT">出错了</h3>
+  <p id="fatalM"></p>
+</div></div>
+
+<script type="module">
+/* ======================================================================
+   小克 · 表情桌宠
+   - MediaPipe Tasks Vision: FaceLandmarker(478) + HandLandmarker(21)
+   - 几何特征 → 归一化向量 → 对已录基准做最近邻 → 当前表情
+   - 表情驱动：小克心情/GIF + 浮动 emoji + 气泡 + 粒子
+   - 手部独立飞吻逻辑；校准模式拖拽关键点修正偏移
+   ====================================================================== */
+
+const TASKS_VER = "0.10.14";
+const CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${TASKS_VER}`;
+const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+const HAND_MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+
+/* ---- 关键点索引（MediaPipe FaceMesh 标准编号） ---- */
+const L_EYE = {p1:33,  p2:160, p3:158, p4:133, p5:153, p6:144};
+const R_EYE = {p1:362, p2:385, p3:387, p4:263, p5:373, p6:380};
+const MOUTH = {top:13, bottom:14, left:61, right:291};
+const BROW  = {lB:105, lE:159, rB:334, rE:386};
+const EYEC  = {lOut:33, lIn:133, rIn:362, rOut:263};
+const KEY_IDX = [33,160,158,133,153,144, 362,385,387,263,373,380, 13,14,61,291, 105,159,334,386];
+const KEY_SET = new Set(KEY_IDX);
+const HAND_TIPS = [4,8,12,16,20];
+
+/* ---- 特征向量维度（顺序固定） ---- */
+const FEAT_ORDER = ["earL","earR","mouthOpen","mouthWidth","smileLift","browRaise","rollN"];
+const STD_FLOOR  = [0.030,0.030,0.045,0.055,0.030,0.045,0.140];
+
+/* ---- 显示用度量 ---- */
+const METRICS = [
+  {key:"earL",      label:"左眼 EAR",  min:0.05, max:0.42, fmt:v=>v.toFixed(2)},
+  {key:"earR",      label:"右眼 EAR",  min:0.05, max:0.42, fmt:v=>v.toFixed(2)},
+  {key:"mouthOpen", label:"嘴张开度",  min:0.00, max:0.60, fmt:v=>v.toFixed(2)},
+  {key:"smileLift", label:"微笑度",    min:-0.10,max:0.18, fmt:v=>v.toFixed(2)},
+  {key:"browRaise", label:"抬眉",      min:0.28, max:0.60, fmt:v=>v.toFixed(2)},
+  {key:"roll",      label:"头部倾斜",  min:-30,  max:30,   fmt:v=>(v>0?"+":"")+v.toFixed(0)+"°", signed:true},
+];
+
+/* ---- 预设表情 + 默认反应 ---- */
+const PRESETS = [
+  {name:"中性",  emoji:"😐", mood:"neutral",  bubble:"……在呢", emojis:"😌",       particle:"none"},
+  {name:"开心",  emoji:"😄", mood:"happy",    bubble:"嘿嘿，找到你啦！", emojis:"😄✨💛", particle:"sparkle"},
+  {name:"惊讶",  emoji:"😮", mood:"surprise", bubble:"哇——！", emojis:"😮❗💫",   particle:"star"},
+  {name:"生气",  emoji:"😠", mood:"angry",    bubble:"哼！别闹啦！", emojis:"😠💢🔥", particle:"anger"},
+  {name:"难过",  emoji:"🥺", mood:"sad",      bubble:"呜…抱抱我嘛", emojis:"🥺💧",   particle:"tear"},
+];
+const MOOD_EMOJI = {neutral:"😐",happy:"😄",surprise:"😮",angry:"😠",sad:"🥺",kiss:"😘"};
+
+/* ====================== DOM ====================== */
+const $ = id => document.getElementById(id);
+const video=$("cam"), overlay=$("overlay"), octx=overlay.getContext("2d");
+const fx=$("fx"), fctx=fx.getContext("2d");
+const petEl=$("pet"), petGif=$("petGif"), petCanvas=$("petCanvas"), pctx=petCanvas.getContext("2d");
+const bubble=$("bubble"), bubbleText=$("bubbleText");
+const emojiLayer=$("emojiLayer"), floorShadow=$("floorShadow"), stage=$("stage");
+const modelDot=$("modelDot"), modelState=$("modelState"), lmCount=$("lmCount"), fpsEl=$("fps");
+const faceBadge=$("faceBadge"), handBadge=$("handBadge"), camEmpty=$("camEmpty");
+const curExpr=$("curExpr"), curSub=$("curSub"), tipText=$("tipText"), tipIcon=$("tipIcon");
+const toastEl=$("toast");
+
+/* ====================== 状态 ====================== */
+let faceLm=null, handLm=null;
+let running=false, modelsReady=false;
+let lastVideoTime=-1, frameCount=0;
+let calibrating=false;
+let templates=[];          // {id,name,mood,bubble,emojis,particle,vec[],gifUrl}
+let calibOffset=null;      // Float arrays of {x,y} length up to 478, normalized & scale-relative
+let calibFrozen=null;      // 冻结帧 (raw landmarks)
+let calibScale=1;
+let selectedId=null;       // 编辑中的基准
+let smoothVec=null;        // EMA 平滑后的向量
+let currentLabel=null, currentTpl=null;
+let pending=null, pendingT=0;
+let kissUntil=0, lastFaceLandmarks=null;
+let tplLiveDists={};       // 每条基准的实时距离
+const ALPHA=0.35, COMMIT_MS=260, MAX_MATCH_DIST=4.2;
+const LOCAL_KEY="kc-deskpet-v2";
+
+/* ====================== 工具 ====================== */
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>Math.random().toString(36).slice(2,9);
+function splitEmoji(s){ return s? Array.from(s.replace(/\s+/g,"")) : []; }
+
+function showFatal(title,msg){
+  $("fatalT").textContent=title; $("fatalM").innerHTML=msg; $("fatal").style.display="grid";
+}
+
+function toast(msg, ms=2000){
+  toastEl.textContent=msg; toastEl.classList.add("show");
+  clearTimeout(toastEl._tid); toastEl._tid=setTimeout(()=>toastEl.classList.remove("show"),ms);
+}
+
+/* ====================== 数据持久化 ====================== */
+function saveAll(){
+  const data={
+    templates: templates.map(t=>({id:t.id,name:t.name,mood:t.mood,bubble:t.bubble,emojis:t.emojis,particle:t.particle,vec:t.vec,gifUrl:t.gifUrl||null})),
+    calibOffset: calibOffset ? calibOffset.map(o=>o?{x:o.x,y:o.y}:{x:0,y:0}) : null,
+    calibScale
+  };
+  try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); }catch(e){ console.warn("localStorage 写入失败",e); }
+}
+function loadAll(){
+  try{
+    const raw=localStorage.getItem(LOCAL_KEY); if(!raw) return;
+    const data=JSON.parse(raw);
+    if(data.templates && Array.isArray(data.templates)){
+      templates=data.templates.map(t=>({...t, vec:t.vec||[], gifUrl:t.gifUrl||null}));
+      templates=templates.filter(t=>t.vec && t.vec.length===FEAT_ORDER.length);
+    }
+    if(data.calibOffset && Array.isArray(data.calibOffset)){
+      calibOffset=data.calibOffset.map(o=>o?{x:o.x||0,y:o.y||0}:{x:0,y:0});
+      calibScale=data.calibScale||1;
+      updateCalibInfo();
+    }
+    recomputeStd();
+    renderTpls();
+  }catch(e){ console.warn("localStorage 读取失败",e); }
+}
+
+/* ====================== 初始化模型 ====================== */
+async function initModels(){
+  modelDot.className="dot busy"; modelState.textContent="加载模型…";
+  let vision, FaceLandmarker, HandLandmarker, FilesetResolver;
+  try{
+    ({FaceLandmarker,HandLandmarker,FilesetResolver} = await import(`${CDN}/vision_bundle.mjs`));
+  }catch(e){
+    modelDot.className="dot err"; modelState.textContent="脚本加载失败";
+    showFatal("无法加载 MediaPipe","浏览器没能从 CDN 加载 <code>@mediapipe/tasks-vision</code>。<br>请检查网络后刷新；若在受限环境，请允许访问 <code>cdn.jsdelivr.net</code> 与 <code>storage.googleapis.com</code>。");
+    throw e;
+  }
+  try{
+    vision = await FilesetResolver.forVisionTasks(`${CDN}/wasm`);
+    const mk = async (delegate)=>{
+      faceLm = await FaceLandmarker.createFromOptions(vision,{
+        baseOptions:{modelAssetPath:FACE_MODEL, delegate},
+        runningMode:"VIDEO", numFaces:1, outputFaceBlendshapes:false
+      });
+      handLm = await HandLandmarker.createFromOptions(vision,{
+        baseOptions:{modelAssetPath:HAND_MODEL, delegate},
+        runningMode:"VIDEO", numHands:2
+      });
+    };
+    try{ await mk("GPU"); }
+    catch(gpuErr){ console.warn("GPU 失败，回退 CPU",gpuErr); await mk("CPU"); }
+  }catch(e){
+    modelDot.className="dot err"; modelState.textContent="模型加载失败";
+    showFatal("模型加载失败","无法下载 MediaPipe 模型权重。请检查网络（需访问 <code>storage.googleapis.com</code>）后刷新。");
+    throw e;
+  }
+  modelsReady=true; modelDot.className="dot ok"; modelState.textContent="模型就绪";
+  refreshButtons();
+}
+
+/* ====================== 摄像头 ====================== */
+async function startCamera(){
+  if(running) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{width:{ideal:640},height:{ideal:480},facingMode:"user"}, audio:false
+    });
+    video.srcObject=stream;
+    await video.play();
+    camEmpty.style.display="none";
+    running=true;
+    $("startBtn").textContent="摄像头已开启";
+    $("startBtn").disabled=true;
+    faceBadge.classList.add("on");
+    sizeCanvases();
+    requestAnimationFrame(loop);
+    refreshButtons();
+  }catch(e){
+    showFatal("无法访问摄像头",
+      "浏览器拒绝了摄像头权限，或当前页面不是安全来源。<br>"+
+      "• 请在弹窗中点「允许」。<br>"+
+      "• 若直接双击打开本文件 (file://)，部分浏览器会禁用摄像头：请改用本地服务器，例如在文件目录执行 <code>python -m http.server</code> 后访问 <code>http://localhost:8000/</code>。<br><br>"+
+      "<span style='font-size:12px;color:#a99'>错误："+(e&&e.name||e)+"</span>");
+  }
+}
+
+function sizeCanvases(){
+  const r = video.getBoundingClientRect();
+  for(const c of [overlay]){ c.width=Math.round(r.width); c.height=Math.round(r.height); }
+  const sr = stage.getBoundingClientRect();
+  fx.width=Math.round(sr.width); fx.height=Math.round(sr.height);
+}
+window.addEventListener("resize", ()=>{ if(running) sizeCanvases(); });
+
+/* ====================== 主循环 ====================== */
+let lastT=performance.now(), fpsAcc=0, fpsN=0;
+function loop(now){
+  if(!running){ return; }
+  requestAnimationFrame(loop);
+  const dt=(now-lastT)/1000; lastT=now;
+
+  // 粒子每帧更新（与检测解耦）
+  FX.update(dt); FX.draw();
+
+  if(modelsReady && video.readyState>=2 && video.currentTime!==lastVideoTime){
+    lastVideoTime=video.currentTime;
+    frameCount++;
+    const ts=now;
+    let faceRes=null, handRes=null;
+    try{ faceRes=faceLm.detectForVideo(video,ts); }catch(e){}
+    if(frameCount%2===0){ try{ handRes=handLm.detectForVideo(video,ts); }catch(e){} }
+    processFace(faceRes);
+    if(handRes) processHand(handRes);
+
+    // FPS
+    fpsAcc+=dt; fpsN++;
+    if(fpsAcc>=0.5){ fpsEl.textContent=Math.round(fpsN/fpsAcc); fpsAcc=0; fpsN=0; }
+  }
+  // 脚下影子随心情轻微变化
+  syncShadow();
+}
+
+/* ====================== 处理人脸 ====================== */
+function processFace(res){
+  const has = res && res.faceLandmarks && res.faceLandmarks.length>0;
+  faceBadge.classList.toggle("on", !!has);
+  if(!has){ lmCount.textContent="0"; lastFaceLandmarks=null; if(!calibrating) drawOverlay(null); return; }
+
+  const raw = res.faceLandmarks[0];
+  lmCount.textContent=String(raw.length);            // 应为 478
+  lastFaceLandmarks = raw;
+
+  if(calibrating){ drawCalib(); return; }             // 校准时暂停识别
+
+  const lm = applyCalibration(raw);
+  const f  = computeFeatures(lm);
+  const v  = featVector(f);
+  smoothVec = smoothVec ? smoothVec.map((s,i)=>ALPHA*v[i]+(1-ALPHA)*s) : v.slice();
+
+  updateMetrics(vecToFeat(smoothVec));
+  classify(smoothVec);
+
+  if($("showLm").checked) drawOverlay(lm); else drawOverlay(null);
+}
+
+/* ---- 特征计算 ---- */
+function ear(eye,lm){
+  const p1=lm[eye.p1],p2=lm[eye.p2],p3=lm[eye.p3],p4=lm[eye.p4],p5=lm[eye.p5],p6=lm[eye.p6];
+  const h=dist(p1,p4); if(h<1e-6) return 0;
+  return (dist(p2,p6)+dist(p3,p5))/(2*h);
+}
+function computeFeatures(lm){
+  const lc=mid(lm[EYEC.lOut],lm[EYEC.lIn]);
+  const rc=mid(lm[EYEC.rIn],lm[EYEC.rOut]);
+  const scale=Math.max(dist(lc,rc),1e-4);
+  const earL=ear(L_EYE,lm), earR=ear(R_EYE,lm);
+  const mTop=lm[MOUTH.top], mBot=lm[MOUTH.bottom], mL=lm[MOUTH.left], mR=lm[MOUTH.right];
+  const mouthOpen=dist(mTop,mBot)/scale;
+  const mouthWidth=dist(mL,mR)/scale;
+  const mouthCenterY=(mTop.y+mBot.y)/2, cornerY=(mL.y+mR.y)/2;
+  const smileLift=(mouthCenterY-cornerY)/scale;        // 嘴角高于中心 → 正
+  const browRaise=((dist(lm[BROW.lB],lm[BROW.lE])+dist(lm[BROW.rB],lm[BROW.rE]))/2)/scale;
+  const roll=Math.atan2(rc.y-lc.y, rc.x-lc.x)*180/Math.PI;
+  return {earL,earR,mouthOpen,mouthWidth,smileLift,browRaise,roll};
+}
+function featVector(f){ return [f.earL,f.earR,f.mouthOpen,f.mouthWidth,f.smileLift,f.browRaise,f.roll/45]; }
+function vecToFeat(v){ return {earL:v[0],earR:v[1],mouthOpen:v[2],mouthWidth:v[3],smileLift:v[4],browRaise:v[5],roll:v[6]*45}; }
+
+/* ---- 校准偏移（按脸部尺度自适应叠加） ---- */
+function applyCalibration(raw){
+  if(!calibOffset) return raw;
+  // 当前帧尺度
+  const lc=mid(raw[EYEC.lOut],raw[EYEC.lIn]), rc=mid(raw[EYEC.rIn],raw[EYEC.rOut]);
+  const s=Math.max(dist(lc,rc),1e-4);
+  const k=s/calibScale;                                // 相对录制时尺度缩放
+  const out=raw.map(p=>({x:p.x,y:p.y,z:p.z}));
+  for(let i=0;i<out.length && i<calibOffset.length;i++){
+    const o=calibOffset[i]; if(o && (o.x||o.y)){ out[i].x+=o.x*k; out[i].y+=o.y*k; }
+  }
+  return out;
+}
+
+/* ====================== 最近邻分类 ====================== */
+let invStd=null;
+function recomputeStd(){
+  if(templates.length<1){ invStd=null; return; }
+  const n=FEAT_ORDER.length, mean=new Array(n).fill(0), std=new Array(n).fill(0);
+  for(const t of templates) for(let i=0;i<n;i++) mean[i]+=t.vec[i];
+  for(let i=0;i<n;i++) mean[i]/=templates.length;
+  for(const t of templates) for(let i=0;i<n;i++){ const d=t.vec[i]-mean[i]; std[i]+=d*d; }
+  invStd=new Array(n);
+  for(let i=0;i<n;i++){ const s=Math.max(Math.sqrt(std[i]/templates.length), STD_FLOOR[i]); invStd[i]=1/s; }
+}
+function tplDist(v,t){
+  let s=0; const n=FEAT_ORDER.length;
+  for(let i=0;i<n;i++){ const d=(v[i]-t.vec[i])*invStd[i]; s+=d*d; }
+  return Math.sqrt(s/n);
+}
+function classify(v){
+  if(kissUntil>performance.now()) return;              // 飞吻接管中
+  if(templates.length===0 || !invStd){
+    curExpr.textContent="—"; curSub.textContent="先录制基准";
+    if(currentLabel!==null){ currentLabel=null; currentTpl=null; applyMood("neutral"); highlightActive(null); }
+    return;
+  }
+  // 计算所有模板距离
+  const dists=[];
+  for(const t of templates){ const d=tplDist(v,t); dists.push({t,d}); tplLiveDists[t.id]=d; }
+  dists.sort((a,b)=>a.d-b.d);
+  const best=dists[0], sec=dists.length>1?dists[1].d:Infinity;
+  updateTplLive();
+
+  const now=performance.now();
+  const label=best.t.id;
+  curExpr.textContent=best.t.name;
+  const margin = sec===Infinity?0:(sec-best.d);
+  curSub.textContent=`d=${best.d.toFixed(2)}  Δ=${margin.toFixed(2)}`;
+
+  if(best.d>MAX_MATCH_DIST){
+    return; // 没有足够近的匹配
+  }
+  if(label===currentLabel){ pending=null; return; }
+  if(pending===label){
+    if(now-pendingT>=COMMIT_MS){ commitExpr(best.t); pending=null; }
+  }else{ pending=label; pendingT=now; }
+}
+function commitExpr(tpl){
+  currentLabel=tpl.id; currentTpl=tpl;
+  applyReaction(tpl,true);
+  highlightActive(tpl.id);
+}
+
+/* ====================== 像素小克渲染器 ====================== */
+/* 原生分辨率 56×66，CSS 放大 + image-rendering:pixelated  → 锐利像素风 */
+pctx.imageSmoothingEnabled=false;
+
+const PAL={
+  body:"#7ed7c2",bodyDk:"#5bbca4",bodyLt:"#a0e4d4",belly:"#d5f5ec",
+  outline:"#3aa893",outlineDk:"#2a8a76",
+  eye:"#2d2722",eyeW:"#ffffff",
+  blush:"#ffb3a8",blushDk:"#f09080",
+  mouth:"#2d2722",tongue:"#ff7d8a",
+  sprout:"#54c9b4",sproutDk:"#3aa893",
+  footFill:"#5bbca4",footDk:"#3aa893",
+  angry:"#ff4d4d",angryLt:"#ff7050",
+  tear:"#6fb8e8",tearHl:"#b0ddf7",
+  heart:"#ff5d72",heartLt:"#ff8aa0",
+  trans:"transparent"
+};
+
+// 像素级 helper
+const ps=(x,y,c)=>{if(c!==PAL.trans){pctx.fillStyle=c;pctx.fillRect(x,y,1,1);}};
+const pr=(x,y,w,h,c)=>{pctx.fillStyle=c;pctx.fillRect(x,y,w,h);};
+const ph=(y,x1,x2,c)=>{pctx.fillStyle=c;pctx.fillRect(x1,y,x2-x1+1,1);};
+
+let petFrame=0, petMood="neutral", petBlinkT=0;
+function tickPetFrame(){ petFrame++; }
+
+// --- 在原生分辨率下画椭圆（无抗锯齿） ---
+function pEllipse(cx,cy,rx,ry,c){
+  pctx.fillStyle=c;
+  for(let dy=-ry;dy<=ry;dy++){
+    for(let dx=-rx;dx<=rx;dx++){
+      if((dx*dx)/(rx*rx)+(dy*dy)/(ry*ry)<=1.05)
+        pctx.fillRect(cx+dx,cy+dy,1,1);
+    }
+  }
+}
+
+// --- 画身体（56×66 画布内的主体躯干） ---
+const BODY_ROWS=[ // [y, x0, x1] 每行左右边界（含）
+  [6, 24,31],[7,21,34],[8,19,36],[9,17,38],[10,15,40],
+  [11,13,42],[12,12,43],[13,11,44],
+];
+// 生成完整 body 行（y=14~49 为全宽）
+for(let y=14;y<=49;y++) BODY_ROWS.push([y,10,45]);
+BODY_ROWS.push([50,11,44],[51,13,42],[52,15,40],[53,17,38],[54,19,36],[55,21,34],[56,23,31]);
+
+function drawBody(offsY){
+  const oy=Math.round(offsY||0);
+  // 身体填充
+  for(const [y,x0,x1] of BODY_ROWS){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    // 主体色
+    let col=PAL.body;
+    if(y<=14) col=PAL.bodyLt;                          // 顶部高光
+    else if(y>=46) col=PAL.bodyDk;                     // 底部阴影
+    pr(x0,yy,x1-x0+1,1,col);
+    // 细微渐变
+    if(y>=20&&y<=40){
+      const mid=Math.floor((x0+x1)/2);
+      // 肚子亮部
+      const bw=Math.floor((x1-x0)*0.45);
+      pr(mid-bw+2,yy,bw*2-4,1,PAL.belly);
+    }
+  }
+  // 轮廓线（上下边缘加深）
+  for(const [y,x0,x1] of BODY_ROWS){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    ps(x0,yy,PAL.outline); ps(x1,yy,PAL.outline);
+  }
+  // 身体顶部轮廓加粗
+  for(let y=6;y<=9;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
+  // 底部轮廓
+  for(let y=53;y<=56;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
+}
+
+// --- 耳朵 ---
+function drawEars(offsY){
+  const oy=Math.round(offsY||0);
+  // 左耳 (三角)
+  const le=[
+    [4,20,22],[5,19,21],[6,18,20],[7,17,19],[8,17,19]
+  ];
+  for(const [y,x0,x1] of le){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=y<=5?PAL.outline:(y===8?PAL.bodyDk:PAL.bodyLt);
+      ps(x,yy,c);
+    }
+  }
+  // 右耳
+  const re=[
+    [4,33,35],[5,34,36],[6,35,37],[7,36,38],[8,36,38]
+  ];
+  for(const [y,x0,x1] of re){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=y<=5?PAL.outline:(y===8?PAL.bodyDk:PAL.bodyLt);
+      ps(x,yy,c);
+    }
+  }
+}
+
+// --- 脚 ---
+function drawFeet(offsY){
+  const oy=Math.round(offsY||0);
+  // 左足
+  const lf=[[55,16,25],[56,15,26],[57,14,27],[58,15,25],[59,16,24]];
+  for(const [y,x0,x1] of lf){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=(y===55||y===59)?PAL.footDk:(x===x0||x===x1?PAL.footDk:PAL.footFill);
+      ps(x,yy,c);
+    }
+  }
+  // 右足
+  const rf=[[55,30,39],[56,30,40],[57,28,41],[58,30,40],[59,31,39]];
+  for(const [y,x0,x1] of rf){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=(y===55||y===59)?PAL.footDk:(x===x0||x===x1?PAL.footDk:PAL.footFill);
+      ps(x,yy,c);
+    }
+  }
+}
+
+// --- 嫩芽 ---
+function drawSprout(offsY){
+  const oy=Math.round(offsY||0);
+  // 茎
+  for(let y=1;y<=5;y++){ const yy=y+oy; if(yy>=0&&yy<66){ ps(27,yy,PAL.sproutDk); ps(28,yy,PAL.sproutDk); } }
+  // 左叶
+  const ll=[[0,24,27],[1,23,28],[2,22,29],[3,23,28],[4,24,27]];
+  for(const [y,x0,x1] of ll){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=(x===x0||x===x1||y===0||y===4)?PAL.sproutDk:PAL.sprout;
+      ps(x,yy,c);
+    }
+  }
+  // 右叶
+  const rl=[[0,28,31],[1,27,32],[2,26,33],[3,27,32],[4,28,31]];
+  for(const [y,x0,x1] of rl){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){
+      const c=(x===x0||x===x1||y===0||y===4)?PAL.sproutDk:PAL.sprout;
+      ps(x,yy,c);
+    }
+  }
+}
+
+// --- 眼睛（各心情不同） ---
+function drawEyes(mood, offsY){
+  const oy=Math.round(offsY||0);
+  // 左眼中心 (~21,27) 右眼中心 (~35,27)
+  const blink = (petBlinkT>0); // 眨眼时闭眼
+
+  if(mood==="happy"){
+    // ^^ 弯弯笑眼
+    if(!blink){
+      // 左眼 ^ 线
+      ph(23+oy,18,24,PAL.eye); ph(24+oy,17,25,PAL.eye); ph(25+oy,17,25,PAL.eye);
+      // 右眼 ^ 线
+      ph(23+oy,32,37,PAL.eye); ph(24+oy,31,38,PAL.eye); ph(25+oy,31,38,PAL.eye);
+    }else{
+      ph(25+oy,18,24,PAL.eye); ph(25+oy,32,37,PAL.eye);
+    }
+  }else if(mood==="surprise"){
+    // 大圆眼
+    if(!blink){
+      // 左眼白
+      for(let dy=-5;dy<=5;dy++) for(let dx=-5;dx<=5;dx++){ if(dx*dx+dy*dy<=27) ps(21+dx,27+dy+oy,PAL.eyeW); }
+      // 左瞳孔
+      for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=6) ps(21+dx,27+dy+oy,PAL.eye); }
+      ps(20,25+oy,PAL.eyeW); // highlight
+      // 右眼白
+      for(let dy=-5;dy<=5;dy++) for(let dx=-5;dx<=5;dx++){ if(dx*dx+dy*dy<=27) ps(35+dx,27+dy+oy,PAL.eyeW); }
+      for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=6) ps(35+dx,27+dy+oy,PAL.eye); }
+      ps(34,25+oy,PAL.eyeW);
+    }else{
+      ph(27+oy,16,25,PAL.eye); ph(27+oy,30,39,PAL.eye);
+    }
+  }else if(mood==="angry"){
+    // 锐利斜眼 + V 眉
+    if(!blink){
+      // 左眼（半闭菱形）
+      for(let dy=-1;dy<=1;dy++) for(let dx=-4;dx<=4;dx++){ if(Math.abs(dx)+Math.abs(dy)<=5) ps(21+dx,28+dy+oy,PAL.eye); }
+      ps(19,27+oy,PAL.eyeW);
+      // 右眼
+      for(let dy=-1;dy<=1;dy++) for(let dx=-4;dx<=4;dx++){ if(Math.abs(dx)+Math.abs(dy)<=5) ps(35+dx,28+dy+oy,PAL.eye); }
+      ps(33,27+oy,PAL.eyeW);
+      // V 眉
+      ph(20+oy,16,18,PAL.angry); ps(15,21+oy,PAL.angry); ps(16,20+oy,PAL.angry); ps(17,19+oy,PAL.angry);
+      ph(20+oy,37,39,PAL.angry); ps(40,21+oy,PAL.angry); ps(39,20+oy,PAL.angry); ps(38,19+oy,PAL.angry);
+    }else{
+      ph(28+oy,17,24,PAL.eye); ph(28+oy,31,38,PAL.eye);
+    }
+  }else if(mood==="sad"){
+    // 下垂大眼
+    if(!blink){
+      // 左眼（椭圆稍下倾）
+      for(let dy=-3;dy<=3;dy++) for(let dx=-4;dx<=4;dx++){ if((dx*dx)/16+((dy-1)*(dy-1))/12<=1.1) ps(21+dx,27+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(21+dx,27+dy+oy,PAL.eye); }
+      ps(20,25+oy,PAL.eyeW);
+      // 右眼
+      for(let dy=-3;dy<=3;dy++) for(let dx=-4;dx<=4;dx++){ if((dx*dx)/16+((dy-1)*(dy-1))/12<=1.1) ps(35+dx,27+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(35+dx,27+dy+oy,PAL.eye); }
+      ps(34,25+oy,PAL.eyeW);
+      // 八字眉
+      ph(22+oy,17,20,PAL.eye); ps(16,23+oy,PAL.eye);
+      ph(22+oy,35,38,PAL.eye); ps(39,23+oy,PAL.eye);
+    }else{
+      ph(28+oy,17,24,PAL.eye); ph(28+oy,31,38,PAL.eye);
+    }
+  }else if(mood==="kiss"){
+    // 笑眯眼 (同 happy 的 ^^)
+    ph(23+oy,18,24,PAL.eye); ph(24+oy,17,25,PAL.eye); ph(25+oy,17,25,PAL.eye);
+    ph(23+oy,32,37,PAL.eye); ph(24+oy,31,38,PAL.eye); ph(25+oy,31,38,PAL.eye);
+  }else{
+    // neutral: 正常圆眼
+    if(!blink){
+      for(let dy=-3;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){ if(dx*dx+dy*dy<=10) ps(21+dx,26+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(21+dx,27+dy+oy,PAL.eye); }
+      ps(20,24+oy,PAL.eyeW);
+      for(let dy=-3;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){ if(dx*dx+dy*dy<=10) ps(35+dx,26+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(35+dx,27+dy+oy,PAL.eye); }
+      ps(34,24+oy,PAL.eyeW);
+    }else{
+      ph(28+oy,18,24,PAL.eye); ph(28+oy,32,38,PAL.eye);
+    }
+  }
+}
+
+// --- 腮红 ---
+function drawBlush(mood, offsY){
+  const oy=Math.round(offsY||0);
+  if(mood==="angry") return; // 生气没腮红
+  const bCol=mood==="kiss"?PAL.heart:PAL.blush;
+  // 左
+  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=5) ps(14+dx,35+dy+oy,bCol); }
+  // 右
+  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=5) ps(42+dx,35+dy+oy,bCol); }
+}
+
+// --- 嘴 ---
+function drawMouth(mood, offsY){
+  const oy=Math.round(offsY||0);
+  if(mood==="neutral"){
+    // 小微笑线
+    ph(40+oy,25,31,PAL.mouth);
+  }else if(mood==="happy"){
+    // 大笑嘴
+    ph(40+oy,24,32,PAL.mouth);
+    ph(41+oy,23,33,PAL.mouth);
+    ph(42+oy,24,32,PAL.mouth);
+    // 舌头
+    for(let y=42;y<=44;y++) for(let x=25;x<=31;x++){
+      if(y===42&&(x<26||x>30)) continue;
+      ps(x,y+oy,PAL.tongue);
+    }
+  }else if(mood==="surprise"){
+    // O 嘴
+    for(let dy=-3;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){ if(dx*dx+dy*dy<=12) ps(28+dx,42+dy+oy,PAL.mouth); }
+  }else if(mood==="angry"){
+    // 锯齿嘴 / 波浪
+    ph(42+oy,24,26,PAL.mouth); ps(25,43+oy,PAL.mouth); ph(44+oy,25,26,PAL.mouth);
+    ph(42+oy,30,32,PAL.mouth); ps(31,43+oy,PAL.mouth); ph(44+oy,30,32,PAL.mouth);
+  }else if(mood==="sad"){
+    // 下弯嘴
+    ph(44+oy,25,31,PAL.mouth);
+    ph(43+oy,24,25,PAL.mouth); ph(43+oy,31,32,PAL.mouth);
+  }else if(mood==="kiss"){
+    // 嘟嘴小心形
+    ps(26,41+oy,PAL.heart); ps(30,41+oy,PAL.heart);
+    ps(25,42+oy,PAL.heart); ps(27,42+oy,PAL.heartLt); ps(29,42+oy,PAL.heartLt); ps(31,42+oy,PAL.heart);
+    ps(26,43+oy,PAL.heart); ps(30,43+oy,PAL.heart);
+    ps(27,44+oy,PAL.heartLt); ps(28,44+oy,PAL.heart); ps(29,44+oy,PAL.heartLt);
+    ps(28,45+oy,PAL.heart);
+  }
+}
+
+// --- 特殊装饰 ---
+function drawExtras(mood, offsY){
+  const oy=Math.round(offsY||0);
+  if(mood==="sad"){
+    // 泪滴
+    const tearFrame=Math.floor(petFrame/4)%2;
+    if(tearFrame===0){
+      ps(16,39+oy,PAL.tear); ps(16,40+oy,PAL.tear);
+      ps(15,40+oy,PAL.tearHl); ps(17,40+oy,PAL.tear);
+      ps(16,41+oy,PAL.tearHl); ps(17,41+oy,PAL.tear);
+      // 右泪
+      ps(40,38+oy,PAL.tear); ps(40,39+oy,PAL.tear);
+      ps(39,39+oy,PAL.tearHl); ps(41,39+oy,PAL.tear);
+    }
+  }
+  if(mood==="angry"){
+    // 怒气符号（右上方）
+    const ax=42, ay=14+oy;
+    ps(ax,ay,PAL.angryLt); ps(ax+4,ay,PAL.angryLt);
+    ps(ax+1,ay+1,PAL.angryLt); ps(ax+3,ay+1,PAL.angryLt);
+    ps(ax+2,ay+2,PAL.angry); ps(ax+2,ay-1,PAL.angry);
+    ps(ax-1,ay+1,PAL.angry); ps(ax+5,ay+1,PAL.angry);
+    // 身体红色罩（肚子上几行淡红）
+    for(let y=25;y<=38;y++){
+      const r=BODY_ROWS.find(r=>r[0]===y); if(!r) continue;
+      const x0=r[1]+3, x1=r[2]-3;
+      for(let x=x0;x<=x1;x+=2) ps(x,y+oy,"rgba(255,90,70,0.45)");
+    }
+  }
+  if(mood==="kiss"){
+    // 飘小心心（动画位置）
+    const hx=22+Math.round(Math.sin(petFrame*0.25)*3);
+    const hy=12+oy-Math.round((petFrame%12)*0.7);
+    ps(hx,hy,PAL.heart); ps(hx+2,hy,PAL.heart);
+    ps(hx+1,hy+1,PAL.heartLt);
+    ps(hx,hy+1,PAL.heart); ps(hx+2,hy+1,PAL.heart);
+    ps(hx+1,hy+2,PAL.heart);
+  }
+  if(mood==="happy"){
+    // 小音符/闪光
+    const sx=40+Math.round(Math.sin(petFrame*0.3)*2);
+    const sy=16+oy;
+    ps(sx,sy,"#ffc24a"); ps(sx,sy-1,"#fff");
+  }
+}
+
+// --- 主绘制 ---
+function drawPixelPet(mood, frame){
+  pctx.clearRect(0,0,56,66);
+  const offsY = mood==="sad"?1:0; // 难过时略下沉
+  drawEars(offsY);
+  drawSprout(offsY);
+  drawBody(offsY);
+  drawFeet(offsY);
+  drawExtras(mood,offsY);
+  drawEyes(mood,offsY);
+  drawBlush(mood,offsY);
+  drawMouth(mood,offsY);
+}
+
+// --- 表情切换 & 动画 ---
+let petRenderTid=null;
+function petRenderLoop(){
+  tickPetFrame();
+  // 眨眼计时
+  if(petBlinkT>0){
+    petBlinkT--;
+    if(petBlinkT<=0){ petBlinkT=0; }
+  }else if(Math.random()<0.008){ // 约每 4 秒眨眼
+    petBlinkT=4; // 闭眼 4 帧
+  }
+  drawPixelPet(petMood, petFrame);
+  petRenderTid=requestAnimationFrame(petRenderLoop);
+}
+
+/* ====================== 反应：心情 / GIF / 气泡 / emoji / 粒子 ====================== */
+function applyMood(mood){
+  petEl.classList.remove("mood-neutral","mood-happy","mood-surprise","mood-angry","mood-sad","mood-kiss");
+  const m=mood||"neutral";
+  petEl.classList.add("mood-"+m);
+  petMood=m;
+}
+function applyGif(url){
+  if(url){ petGif.src=url; petEl.classList.add("has-gif"); }
+  else{ petEl.classList.remove("has-gif"); }
+}
+let bubbleTimer=null;
+function say(text){
+  if(!text){ bubble.classList.remove("show"); return; }
+  bubbleText.textContent=text;
+  bubble.classList.remove("show"); void bubble.offsetWidth; bubble.classList.add("show");
+  clearTimeout(bubbleTimer); bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 2600);
+}
+function spawnEmojis(list){
+  const arr=splitEmoji(list); if(!arr.length) return;
+  const stageW=stage.clientWidth;
+  arr.forEach((e,i)=>{
+    setTimeout(()=>{
+      const el=document.createElement("div"); el.className="fl-emoji"; el.textContent=e;
+      el.style.left=(stageW/2 + (Math.random()*120-60))+"px";
+      el.style.top =(stage.clientHeight*0.5)+"px";
+      el.style.fontSize=(24+Math.random()*14)+"px";
+      el.style.setProperty("--dx",(Math.random()*120-60)+"px");
+      el.style.setProperty("--dr",(Math.random()*60-30)+"deg");
+      emojiLayer.appendChild(el);
+      el.addEventListener("animationend",()=>el.remove());
+    }, i*90);
+  });
+}
+function applyReaction(tpl, burst){
+  applyMood(tpl.mood);
+  applyGif(tpl.gifUrl||null);
+  say(tpl.bubble);
+  spawnEmojis(tpl.emojis);
+  tipIcon.textContent=MOOD_EMOJI[tpl.mood]||"🙂"; tipText.textContent="识别到："+tpl.name;
+  if(burst && tpl.particle && tpl.particle!=="none"){
+    const c=petCenter(); FX.burst(tpl.particle, c.x, c.y-stage.clientHeight*0.04, {});
+  }
+}
+function petCenter(){
+  const pr=petEl.getBoundingClientRect(), sr=stage.getBoundingClientRect();
+  return {x:pr.left-sr.left+pr.width/2, y:pr.top-sr.top+pr.height*0.42};
+}
+function syncShadow(){
+  const m=petEl.className;
+  const small = m.includes("happy")||m.includes("surprise");
+  floorShadow.style.transform="translateX(-50%) scale("+(small?0.9:1)+",1)";
+}
+
+/* ====================== 手部：飞吻逻辑 ====================== */
+const KISS_NEAR=0.14, KISS_FAR=0.26, KISS_WINDOW=950, KISS_COOLDOWN=1800;
+let kissState="idle", kissArmT=0, kissMinD=9, lastKissTrig=0;
+function processHand(res){
+  const hands=res.landmarks||[];
+  const present=hands.length>0;
+  handBadge.classList.toggle("on", present);
+  if(!present || !lastFaceLandmarks){ kissState="idle"; return; }
+
+  const fc = lastFaceLandmarks;
+  const mouth = mid(fc[MOUTH.top], fc[MOUTH.bottom]);
+  let bestD=Infinity, bestP=null;
+  for(const h of hands){
+    let cx=0,cy=0; for(const i of HAND_TIPS){ cx+=h[i].x; cy+=h[i].y; }
+    const p={x:cx/HAND_TIPS.length,y:cy/HAND_TIPS.length};
+    const d=dist(p,mouth); if(d<bestD){bestD=d;bestP=p;}
+  }
+  const now=performance.now();
+  if(now-lastKissTrig < KISS_COOLDOWN){ return; }
+
+  if(kissState==="idle"){
+    if(bestD<KISS_NEAR){ kissState="armed"; kissArmT=now; kissMinD=bestD; }
+  }else if(kissState==="armed"){
+    kissMinD=Math.min(kissMinD,bestD);
+    if(now-kissArmT>1400){ kissState="idle"; return; }
+    if(bestD>KISS_FAR && kissMinD<KISS_NEAR && (now-kissArmT)<KISS_WINDOW+700){
+      triggerKiss(bestP, mouth); kissState="idle"; lastKissTrig=now;
+    }
+  }
+}
+function triggerKiss(handP, mouthP){
+  kissUntil=performance.now()+2200;
+  applyMood("kiss"); applyGif(null);
+  say("么么哒～ 啾♡");
+  spawnEmojis("😘💋💕");
+  tipIcon.textContent="💋"; tipText.textContent="收到飞吻！";
+  const cx=petCenter().x, cy=petCenter().y;
+  FX.burst("heart", cx, cy-10, {count:26, big:true, dirx:(handP.x<mouthP.x?-1:1)});
+  const el=document.createElement("div"); el.className="fl-emoji"; el.textContent="💋";
+  el.style.left=(cx-14)+"px"; el.style.top=(cy)+"px"; el.style.fontSize="42px";
+  el.style.setProperty("--dx",((handP.x<mouthP.x?-1:1)*120)+"px");
+  el.style.setProperty("--dr","0deg");
+  emojiLayer.appendChild(el); el.addEventListener("animationend",()=>el.remove());
+  setTimeout(()=>{
+    if(performance.now()>=kissUntil){
+      if(currentTpl) applyReaction(currentTpl,false); else applyMood("neutral");
+    }
+  }, 2250);
+}
+
+/* ====================== 粒子系统 ====================== */
+const FX = (()=>{
+  let parts=[];
+  function rnd(a,b){return a+Math.random()*(b-a);}
+  const PRESETS_FX={
+    sparkle:{n:18,life:[0.7,1.2],sp:[40,160],grav:-30,col:["#ffd45a","#fff1b8","#ffe48a"],kind:"star",size:[4,9]},
+    star:   {n:22,life:[0.8,1.4],sp:[120,320],grav:120,col:["#ffc24a","#ff9f43","#fff"],kind:"star",size:[6,13]},
+    heart:  {n:18,life:[1.0,1.8],sp:[60,200],grav:-40,col:["#ff5d72","#ff8aa0","#ff3b66"],kind:"heart",size:[8,16]},
+    tear:   {n:12,life:[0.7,1.2],sp:[30,90],grav:380,col:["#6fb8e8","#9fd0f2"],kind:"drop",size:[5,9]},
+    anger:  {n:14,life:[0.5,0.9],sp:[120,260],grav:60,col:["#ff4d4d","#ff7a3c","#ff3b3b"],kind:"spark",size:[4,9]},
+    confetti:{n:30,life:[1.0,1.8],sp:[120,300],grav:240,col:["#ff6f5e","#1fb9a3","#ffc24a","#6fb8e8","#ff8aa0"],kind:"rect",size:[5,11]},
+  };
+  function burst(type,x,y,opts={}){
+    const p=PRESETS_FX[type]; if(!p) return;
+    const N=opts.count||p.n, big=opts.big?1.5:1;
+    for(let i=0;i<N;i++){
+      let ang;
+      if(type==="tear"){ ang=rnd(Math.PI*0.35,Math.PI*0.65); }
+      else if(type==="heart"){ ang=rnd(-Math.PI*0.95,-Math.PI*0.05); }
+      else{ ang=rnd(0,Math.PI*2); }
+      const sp=rnd(p.sp[0],p.sp[1])*big;
+      let vx=Math.cos(ang)*sp, vy=Math.sin(ang)*sp;
+      if(opts.dirx) vx+=opts.dirx*rnd(20,90);
+      parts.push({
+        x,y,vx,vy, g:p.grav, kind:p.kind,
+        col:p.col[(Math.random()*p.col.length)|0],
+        size:rnd(p.size[0],p.size[1])*big,
+        life:rnd(p.life[0],p.life[1]), age:0,
+        rot:rnd(0,Math.PI*2), vr:rnd(-6,6), tw:rnd(0,Math.PI*2)
+      });
+    }
+    if(parts.length>900) parts=parts.slice(-900);
+  }
+  function update(dt){
+    for(const q of parts){
+      q.age+=dt; q.vy+=q.g*dt; q.vx*=0.992;
+      q.x+=q.vx*dt; q.y+=q.vy*dt; q.rot+=q.vr*dt; q.tw+=dt*8;
+    }
+    parts=parts.filter(q=>q.age<q.life);
+  }
+  function star(ctx,x,y,r,rot,col){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.fillStyle=col; ctx.beginPath();
+    for(let i=0;i<4;i++){ const a=i*Math.PI/2;
+      ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      ctx.lineTo(Math.cos(a+Math.PI/4)*r*0.32,Math.sin(a+Math.PI/4)*r*0.32);
+    } ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function heart(ctx,x,y,s,rot,col){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s/16,s/16); ctx.fillStyle=col;
+    ctx.beginPath(); ctx.moveTo(0,5);
+    ctx.bezierCurveTo(-9,-6,-16,4,0,16); ctx.bezierCurveTo(16,4,9,-6,0,5);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function drop(ctx,x,y,s,col){
+    ctx.save(); ctx.translate(x,y); ctx.fillStyle=col; ctx.beginPath();
+    ctx.moveTo(0,-s); ctx.quadraticCurveTo(s,s*0.6,0,s); ctx.quadraticCurveTo(-s,s*0.6,0,-s);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function draw(){
+    fctx.clearRect(0,0,fx.width,fx.height);
+    for(const q of parts){
+      const t=q.age/q.life, a=clamp(1-t,0,1);
+      fctx.globalAlpha=a;
+      if(q.kind==="star"){ const tw=0.7+0.3*Math.sin(q.tw); star(fctx,q.x,q.y,q.size*tw,q.rot,q.col); }
+      else if(q.kind==="heart"){ heart(fctx,q.x,q.y,q.size,q.rot*0.4,q.col); }
+      else if(q.kind==="drop"){ drop(fctx,q.x,q.y,q.size,q.col); }
+      else if(q.kind==="rect"){ fctx.save(); fctx.translate(q.x,q.y); fctx.rotate(q.rot); fctx.fillStyle=q.col; fctx.fillRect(-q.size/2,-q.size/4,q.size,q.size/2); fctx.restore(); }
+      else {
+        fctx.save(); fctx.translate(q.x,q.y); fctx.rotate(q.rot); fctx.strokeStyle=q.col; fctx.lineWidth=Math.max(2,q.size/3); fctx.lineCap="round";
+        fctx.beginPath(); fctx.moveTo(-q.size,0); fctx.lineTo(q.size,0); fctx.stroke(); fctx.restore();
+      }
+    }
+    fctx.globalAlpha=1;
+  }
+  return {burst,update,draw};
+})();
+
+/* ====================== 关键点绘制 / 校准 ====================== */
+function toDisp(p){ return {x:(1-p.x)*overlay.width, y:p.y*overlay.height}; }
+function fromDisp(px,py){ return {x:1-px/overlay.width, y:py/overlay.height}; }
+
+function drawOverlay(lm){
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  if(!lm) return;
+  octx.fillStyle="rgba(31,185,163,.55)";
+  for(let i=0;i<lm.length;i++){ if(KEY_SET.has(i)) continue; const d=toDisp(lm[i]); octx.beginPath(); octx.arc(d.x,d.y,1.1,0,7); octx.fill(); }
+  octx.fillStyle="#ff6f5e";
+  for(const i of KEY_IDX){ const d=toDisp(lm[i]); octx.beginPath(); octx.arc(d.x,d.y,3.2,0,7); octx.fill(); }
+}
+
+function drawCalib(){
+  octx.clearRect(0,0,overlay.width,overlay.height);
+  if(!calibFrozen) return;
+  const lm = calibFrozen.map((p,i)=>{ const o=calibOffset&&calibOffset[i]; return o?{x:p.x+o.x,y:p.y+o.y}:p; });
+  octx.fillStyle="rgba(120,110,95,.5)";
+  for(let i=0;i<lm.length;i++){ if(KEY_SET.has(i)) continue; const d=toDisp(lm[i]); octx.beginPath(); octx.arc(d.x,d.y,1.3,0,7); octx.fill(); }
+  for(const i of KEY_IDX){
+    const d=toDisp(lm[i]); const sel=(i===dragIdx);
+    octx.fillStyle = sel?"#ffc24a":"#ff6f5e";
+    octx.beginPath(); octx.arc(d.x,d.y, sel?6:4.5, 0,7); octx.fill();
+    octx.lineWidth=2; octx.strokeStyle="rgba(255,255,255,.9)"; octx.stroke();
+  }
+}
+
+/* ---- 校准拖拽 ---- */
+let dragIdx=-1;
+function nearestKey(px,py){
+  let best=-1,bd=18*18;
+  const lm=calibFrozen;
+  for(const i of KEY_IDX){
+    const o=calibOffset&&calibOffset[i]; const p=o?{x:lm[i].x+o.x,y:lm[i].y+o.y}:lm[i];
+    const d=toDisp(p); const dx=d.x-px,dy=d.y-py,dd=dx*dx+dy*dy;
+    if(dd<bd){bd=dd;best=i;}
+  }
+  return best;
+}
+function evtPos(e){
+  const r=overlay.getBoundingClientRect();
+  const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+  const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+  return {x:cx*overlay.width/r.width, y:cy*overlay.height/r.height};
+}
+overlay.addEventListener("pointerdown",e=>{
+  if(!calibrating||!calibFrozen) return;
+  const p=evtPos(e); dragIdx=nearestKey(p.x,p.y);
+  if(dragIdx>=0){ overlay.setPointerCapture(e.pointerId); drawCalib(); }
+});
+overlay.addEventListener("pointermove",e=>{
+  if(!calibrating||dragIdx<0) return;
+  const p=evtPos(e); const target=fromDisp(p.x,p.y);
+  if(!calibOffset) initOffset();
+  calibOffset[dragIdx]={x:target.x-calibFrozen[dragIdx].x, y:target.y-calibFrozen[dragIdx].y};
+  drawCalib(); updateCalibInfo();
+});
+overlay.addEventListener("pointerup",()=>{ if(dragIdx>=0){ dragIdx=-1; drawCalib(); saveAll(); } });
+overlay.addEventListener("pointercancel",()=>{ dragIdx=-1; });
+
+function initOffset(){ calibOffset=new Array(478); for(let i=0;i<478;i++) calibOffset[i]={x:0,y:0}; }
+function updateCalibInfo(){
+  let n=0; if(calibOffset) for(const o of calibOffset){ if(o&&(Math.abs(o.x)>1e-5||Math.abs(o.y)>1e-5)) n++; }
+  $("calibInfo").textContent=`偏移点：${n} / 478`;
+}
+
+/* ====================== 度量条 ====================== */
+function buildMetrics(){
+  const wrap=$("metrics"); wrap.innerHTML="";
+  for(const m of METRICS){
+    const el=document.createElement("div"); el.className="metric"+(m.signed?" signed":"");
+    el.innerHTML=`<div class="top"><span class="name">${m.label}</span><span class="num" id="num-${m.key}">—</span></div>
+      <div class="track"><div class="fill" id="fill-${m.key}"></div></div>`;
+    wrap.appendChild(el);
+  }
+}
+function updateMetrics(f){
+  for(const m of METRICS){
+    const v=f[m.key]; const num=$("num-"+m.key), fill=$("fill-"+m.key);
+    if(v==null||isNaN(v)){ num.textContent="—"; continue; }
+    num.textContent=m.fmt(v);
+    if(m.signed){
+      const half=clamp(Math.abs(v)/Math.max(Math.abs(m.min),m.max),0,1)*50;
+      fill.style.width=half+"%";
+      fill.style.left = v<0 ? (50-half)+"%" : "50%";
+    }else{
+      const pct=clamp((v-m.min)/(m.max-m.min),0,1)*100;
+      fill.style.width=pct+"%";
+    }
+  }
+}
+
+/* ====================== 基准 UI ====================== */
+function buildPresets(){
+  const wrap=$("presets"); wrap.innerHTML="";
+  PRESETS.forEach((p,i)=>{
+    const btn=document.createElement("button"); btn.className="preset";
+    btn.innerHTML=`<span class="e">${p.emoji}</span>${p.name}`;
+    btn.addEventListener("click",()=>quickRecord(p, btn));
+    wrap.appendChild(btn);
+  });
+}
+
+/* ---- 快速录制预设 ---- */
+let recordingTimer=null, recordingCount=0;
+function quickRecord(preset, btnEl){
+  if(!running || !modelsReady || !smoothVec){
+    toast("请先开启摄像头并等待模型就绪"); return;
+  }
+  if(calibrating){ toast("请先退出校准模式"); return; }
+  // 开始录制
+  if(recordingTimer){ clearTimeout(recordingTimer); recordingTimer=null; }
+  recordingCount=0;
+  // 清除所有 preset 的录制状态
+  document.querySelectorAll(".preset.recording").forEach(el=>el.classList.remove("recording"));
+  btnEl.classList.add("recording");
+  const samples=[];
+  const capture=()=>{
+    if(!smoothVec){ recordingCount=0; btnEl.classList.remove("recording"); toast("未检测到人脸"); return; }
+    samples.push(smoothVec.slice());
+    recordingCount=samples.length;
+    if(samples.length>=12){ // ~0.4s at 30fps, capture 12 frames
+      btnEl.classList.remove("recording");
+      const avg = averageVec(samples);
+      const tpl = {
+        id: uid(),
+        name: preset.name,
+        mood: preset.mood,
+        bubble: preset.bubble,
+        emojis: preset.emojis,
+        particle: preset.particle,
+        vec: avg,
+        gifUrl: null
+      };
+      templates.push(tpl);
+      recomputeStd();
+      renderTpls();
+      saveAll();
+      toast(`已录制「${preset.name}」（${samples.length} 帧）`);
+      recordingTimer=null; recordingCount=0;
+      // 若这是第一个基准，直接激活
+      if(templates.length===1){ currentLabel=tpl.id; currentTpl=tpl; highlightActive(tpl.id); }
+      return;
+    }
+    recordingTimer=setTimeout(capture, 33);
+  };
+  capture();
+}
+
+function averageVec(samples){
+  const n=samples[0].length; const avg=new Array(n).fill(0);
+  for(const s of samples) for(let i=0;i<n;i++) avg[i]+=s[i];
+  for(let i=0;i<n;i++) avg[i]/=samples.length;
+  return avg;
+}
+
+/* ---- 自定义录制 ---- */
+function customRecord(){
+  if(!running || !modelsReady || !smoothVec){
+    toast("请先开启摄像头并等待模型就绪"); return;
+  }
+  if(calibrating){ toast("请先退出校准模式"); return; }
+  const nameInp=$("tplName"); let name=nameInp.value.trim();
+  if(!name){
+    // 自动生成名字
+    name = "表情"+(templates.length+1);
+  }
+  const samples=[];
+  const recBtn=$("recordBtn");
+  recBtn.textContent="● 收集中…"; recBtn.style.background="var(--coral)"; recBtn.style.color="#fff";
+  recBtn.disabled=true;
+  const collect=()=>{
+    if(!smoothVec){ recBtn.textContent="● 录制"; recBtn.style.background=""; recBtn.style.color=""; refreshButtons(); toast("未检测到人脸"); return; }
+    samples.push(smoothVec.slice());
+    if(samples.length>=12){
+      const avg=averageVec(samples);
+      const tpl={id:uid(),name,mood:"neutral",bubble:"",emojis:"",particle:"none",vec:avg,gifUrl:null};
+      templates.push(tpl);
+      recomputeStd();
+      renderTpls();
+      saveAll();
+      recBtn.textContent="● 录制"; recBtn.style.background=""; recBtn.style.color="";
+      refreshButtons();
+      toast(`已录制「${name}」（${samples.length} 帧）`);
+      nameInp.value="";
+      if(templates.length===1){ currentLabel=tpl.id; currentTpl=tpl; highlightActive(tpl.id); }
+      return;
+    }
+    recBtn.textContent=`● ${samples.length}/12`;
+    setTimeout(collect, 33);
+  };
+  collect();
+}
+
+/* ---- 渲染模板列表 ---- */
+function renderTpls(){
+  const wrap=$("tpls"); wrap.innerHTML="";
+  if(templates.length===0){ wrap.innerHTML=`<div class="empty-hint">还没有表情基准<br>对镜头做表情后点预设或录制</div>`; return; }
+  templates.forEach(t=>{
+    const div=document.createElement("div"); div.className="tpl";
+    if(t.id===selectedId) div.classList.add("sel");
+    if(t.id===currentLabel) div.classList.add("active");
+    const emoji=MOOD_EMOJI[t.mood]||"🙂";
+    const distStr=tplLiveDists[t.id]!=null ? `d=${tplLiveDists[t.id].toFixed(2)}` : "";
+    div.innerHTML=`<div class="face-mini">${emoji}</div><div class="meta"><div class="nm">${escapeHtml(t.name)}</div><div class="ds">${t.vec.length}D 向量 · ${t.mood}</div></div><div class="live" data-id="${t.id}">${distStr}</div>`;
+    div.addEventListener("click",()=>selectTpl(t.id));
+    wrap.appendChild(div);
+  });
+}
+function updateTplLive(){
+  // 只更新 live 文本，不重建 DOM
+  const els=document.querySelectorAll(".tpl .live");
+  els.forEach(el=>{
+    const id=el.dataset.id;
+    if(tplLiveDists[id]!=null) el.textContent=`d=${tplLiveDists[id].toFixed(2)}`;
+  });
+  // 更新编辑器中选中状态
+  if(selectedId){
+    const sel=document.querySelector(".tpl.sel");
+    const act=document.querySelector(".tpl.active");
+    // 保持 CSS class 同步
+  }
+}
+function highlightActive(id){
+  document.querySelectorAll(".tpl.active").forEach(el=>el.classList.remove("active"));
+  if(id){
+    const tpls=document.querySelectorAll(".tpl");
+    tpls.forEach(el=>{ if(el.querySelector(`.live[data-id="${id}"]`)) el.classList.add("active"); });
+  }
+}
+function selectTpl(id){
+  selectedId=id;
+  const t=templates.find(x=>x.id===id); if(!t) return;
+  // 填充编辑器
+  $("edName").value=t.name;
+  $("edMood").value=t.mood;
+  $("edBubble").value=t.bubble||"";
+  $("edEmojis").value=t.emojis||"";
+  $("edParticle").value=t.particle||"none";
+  if(t.gifUrl){ $("edGifPrev").src=t.gifUrl; $("edGifPrev").classList.add("show"); }
+  else{ $("edGifPrev").src=""; $("edGifPrev").classList.remove("show"); }
+  $("editor").classList.add("show");
+  renderTpls();
+  // 应用到角色（非 burst）
+  applyReaction(t, false);
+  highlightActive(id);
+  currentLabel=id; currentTpl=t;
+}
+function escapeHtml(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+/* ---- 编辑器操作 ---- */
+function applyEditor(){
+  if(!selectedId) return;
+  const t=templates.find(x=>x.id===selectedId); if(!t) return;
+  t.name=$("edName").value.trim()||t.name;
+  t.mood=$("edMood").value;
+  t.bubble=$("edBubble").value.trim();
+  t.emojis=$("edEmojis").value.trim();
+  t.particle=$("edParticle").value;
+  saveAll(); renderTpls();
+  if(currentLabel===t.id){ currentTpl=t; applyReaction(t,false); }
+  toast("已更新「"+t.name+"」");
+}
+function deleteTpl(){
+  if(!selectedId) return;
+  const t=templates.find(x=>x.id===selectedId); if(!t) return;
+  if(!confirm(`删除基准「${t.name}」？`)) return;
+  templates=templates.filter(x=>x.id!==selectedId);
+  if(currentLabel===selectedId){ currentLabel=null; currentTpl=null; applyMood("neutral"); highlightActive(null); }
+  selectedId=null;
+  $("editor").classList.remove("show");
+  recomputeStd();
+  renderTpls();
+  saveAll();
+  toast("已删除「"+t.name+"」");
+}
+
+/* ====================== 校准控制 ====================== */
+function enterCalib(){
+  if(!lastFaceLandmarks){ toast("请先检测到人脸"); return; }
+  calibrating=true;
+  calibFrozen=lastFaceLandmarks.map(p=>({x:p.x,y:p.y,z:p.z}));
+  // 计算当前尺度
+  const lc=mid(calibFrozen[EYEC.lOut],calibFrozen[EYEC.lIn]);
+  const rc=mid(calibFrozen[EYEC.rIn],calibFrozen[EYEC.rOut]);
+  calibScale=Math.max(dist(lc,rc),1e-4);
+  if(!calibOffset) initOffset();
+  overlay.classList.add("calib");
+  drawCalib();
+  updateCalibInfo();
+  refreshButtons();
+  toast("校准模式：拖动红点修正偏移");
+}
+function exitCalib(){
+  calibrating=false; calibFrozen=null; dragIdx=-1;
+  overlay.classList.remove("calib");
+  drawOverlay(null);
+  saveAll();
+  refreshButtons();
+}
+function recapFrame(){
+  if(!calibrating || !lastFaceLandmarks) return;
+  calibFrozen=lastFaceLandmarks.map(p=>({x:p.x,y:p.y,z:p.z}));
+  const lc=mid(calibFrozen[EYEC.lOut],calibFrozen[EYEC.lIn]);
+  const rc=mid(calibFrozen[EYEC.rIn],calibFrozen[EYEC.rOut]);
+  calibScale=Math.max(dist(lc,rc),1e-4);
+  drawCalib();
+  toast("已重新捕获当前帧");
+}
+function resetCalib(){
+  if(!confirm("重置所有关键点偏移？")) return;
+  calibOffset=null; calibScale=1;
+  if(calibrating){ initOffset(); drawCalib(); }
+  updateCalibInfo();
+  saveAll();
+  toast("偏移已重置");
+}
+
+/* ====================== 导出 / 导入 ====================== */
+function exportData(){
+  const data={
+    version:2,
+    exportedAt: new Date().toISOString(),
+    templates: templates.map(t=>({id:t.id,name:t.name,mood:t.mood,bubble:t.bubble,emojis:t.emojis,particle:t.particle,vec:t.vec})),
+    calibOffset: calibOffset ? calibOffset.map(o=>o?{x:o.x,y:o.y}:{x:0,y:0}) : null,
+    calibScale
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="kc-deskpet-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+  URL.revokeObjectURL(a.href);
+  toast("已导出 "+templates.length+" 条基准");
+}
+function importData(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data.templates || !Array.isArray(data.templates)){ toast("无效文件：缺少 templates 数组"); return; }
+      const valid=data.templates.filter(t=>t.vec && t.vec.length===FEAT_ORDER.length);
+      if(valid.length===0){ toast("无效文件：没有合法的特征向量"); return; }
+      if(!confirm(`导入 ${valid.length} 条基准？（将覆盖现有基准，不可撤销）`)) return;
+      templates=valid.map(t=>({...t, vec:t.vec, gifUrl:null}));
+      if(data.calibOffset && Array.isArray(data.calibOffset)){
+        calibOffset=data.calibOffset.map(o=>o?{x:o.x||0,y:o.y||0}:{x:0,y:0});
+        calibScale=data.calibScale||1;
+        updateCalibInfo();
+      }
+      currentLabel=null; currentTpl=null; selectedId=null;
+      $("editor").classList.remove("show");
+      recomputeStd(); renderTpls(); saveAll();
+      applyMood("neutral");
+      toast(`已导入 ${valid.length} 条基准`);
+    }catch(e){ toast("导入失败："+e.message); }
+  };
+  reader.readAsDataURL(file);
+}
+function resetAll(){
+  if(!confirm("清空全部基准与校准数据？此操作不可撤销！")) return;
+  templates=[]; calibOffset=null; calibScale=1;
+  currentLabel=null; currentTpl=null; selectedId=null; smoothVec=null;
+  invStd=null; pending=null;
+  $("editor").classList.remove("show");
+  applyMood("neutral"); applyGif(null);
+  recomputeStd(); renderTpls(); updateCalibInfo(); saveAll();
+  curExpr.textContent="—"; curSub.textContent="等待基准";
+  highlightActive(null);
+  toast("已清空全部数据");
+}
+
+/* ====================== 按钮状态 ====================== */
+function refreshButtons(){
+  $("recordBtn").disabled=!(running && modelsReady && !calibrating);
+  $("calibBtn").disabled=!(running && lastFaceLandmarks && !calibrating);
+  $("recapBtn").disabled=!calibrating;
+  $("resetCalibBtn").disabled=!(calibOffset && calibOffset.some(o=>o&&(Math.abs(o.x)>1e-5||Math.abs(o.y)>1e-5)));
+  if(calibrating){
+    $("calibBtn").textContent="退出校准";
+    $("calibBtn").classList.add("primary");
+    $("calibBtn").classList.remove("mint");
+  }else{
+    $("calibBtn").textContent="进入校准";
+    $("calibBtn").classList.remove("primary");
+    $("calibBtn").classList.add("mint");
+  }
+}
+
+/* ====================== 事件绑定 ====================== */
+$("startBtn").addEventListener("click", ()=>{
+  if(!modelsReady) initModels().then(startCamera).catch(()=>{});
+  else startCamera();
+});
+
+$("calibBtn").addEventListener("click", ()=>{
+  if(calibrating) exitCalib(); else enterCalib();
+});
+$("recapBtn").addEventListener("click", recapFrame);
+$("resetCalibBtn").addEventListener("click", resetCalib);
+
+$("recordBtn").addEventListener("click", customRecord);
+$("exportBtn").addEventListener("click", exportData);
+$("importFile").addEventListener("change", e=>{ if(e.target.files[0]){ importData(e.target.files[0]); e.target.value=""; } });
+$("resetAllBtn").addEventListener("click", resetAll);
+
+// 编辑器
+$("edName").addEventListener("input", applyEditor);
+$("edMood").addEventListener("change", applyEditor);
+$("edBubble").addEventListener("input", applyEditor);
+$("edEmojis").addEventListener("input", applyEditor);
+$("edParticle").addEventListener("change", applyEditor);
+$("edGif").addEventListener("change", e=>{
+  if(!selectedId) return;
+  const f=e.target.files[0]; if(!f) return;
+  const url=URL.createObjectURL(f);
+  const t=templates.find(x=>x.id===selectedId); if(!t) return;
+  t.gifUrl=url;
+  $("edGifPrev").src=url; $("edGifPrev").classList.add("show");
+  saveAll();
+  if(currentLabel===t.id){ currentTpl=t; applyGif(url); }
+  toast("GIF 已应用");
+});
+$("edGifClear").addEventListener("click", ()=>{
+  if(!selectedId) return;
+  const t=templates.find(x=>x.id===selectedId); if(!t) return;
+  t.gifUrl=null;
+  $("edGifPrev").src=""; $("edGifPrev").classList.remove("show");
+  saveAll();
+  if(currentLabel===t.id){ currentTpl=t; applyGif(null); }
+});
+$("edTest").addEventListener("click", ()=>{
+  if(!selectedId) return;
+  const t=templates.find(x=>x.id===selectedId); if(!t) return;
+  applyReaction(t,true);
+  toast("预览「"+t.name+"」");
+});
+$("edDelete").addEventListener("click", deleteTpl);
+
+$("showLm").addEventListener("change", ()=>{
+  if(!$("showLm").checked && !calibrating) drawOverlay(null);
+});
+
+/* ====================== 启动 ====================== */
+buildMetrics();
+buildPresets();
+loadAll();
+renderTpls();
+// 启动像素宠物渲染循环
+petRenderLoop();
+// 自动开始加载模型
+initModels().catch(()=>{});
+// 如果本地已有基准，重新计算标准差
+if(templates.length>0) recomputeStd();
+</script>
+</body>
+</html>
