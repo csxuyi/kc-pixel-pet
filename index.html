@@ -2062,7 +2062,16 @@ function drawExtras(mood, offsY){
 // --- 主绘制 ---
 function drawPixelPet(mood, frame){
   pctx.clearRect(0,0,56,66);
-  const offsY = mood==="sad"?1: (mood==="sleepy"?2:0); // 难过/犯困时略下沉
+  // 邦布模式：直接画预加载的精灵图
+  if(skinMode==="bangboo"){
+    const img=BANGBOO_IMGS[mood]||BANGBOO_IMGS.neutral;
+    if(img&&img.complete&&img.naturalWidth>0){
+      pctx.drawImage(img,0,0,56,66);
+    }
+    return;
+  }
+  // 像素小克模式
+  const offsY = mood==="sad"?1: (mood==="sleepy"?2:0);
   // 拥抱暖光
   if(petExtra==="hug"){
     for(let i=0;i<6;i++){
@@ -2119,7 +2128,16 @@ function petRenderLoop(){
 }
 
 /* ====================== 邦布精灵 (base64) ====================== */
-const BANGBOO_SPRITES={neutral:"images/neutral.png",happy:"images/happy.png",surprise:"images/surprise.png",angry:"images/angry.png",sad:"images/sad.png",kiss:"images/kiss.png",sleepy:"images/sleepy.png",shy:"images/shy.png"}
+/* ---- 邦布精灵预加载 ---- */
+const BANGBOO_IMGS={};
+(function preloadBangboo(){
+  const paths={neutral:"images/neutral.png",happy:"images/happy.png",surprise:"images/surprise.png",angry:"images/angry.png",sad:"images/sad.png",kiss:"images/kiss.png",sleepy:"images/sleepy.png",shy:"images/shy.png"};
+  for(const [mood,src] of Object.entries(paths)){
+    const img=new Image();
+    img.src=src;
+    BANGBOO_IMGS[mood]=img;
+  }
+})();
 
 /* ====================== 反应：心情 / GIF / 气泡 / emoji / 粒子 ====================== */
 function applyMood(mood){
@@ -2127,19 +2145,11 @@ function applyMood(mood){
   const m=mood||"neutral";
   petEl.classList.add("mood-"+m);
   petMood=m;
-  syncSkin();
 }
-function syncSkin(){
-  if(skinMode==="bangboo" && BANGBOO_SPRITES[petMood]){
-    petGif.src=BANGBOO_SPRITES[petMood];
-    petEl.classList.add("has-gif");
-  }else{
-    petEl.classList.remove("has-gif");
-  }
-}
+function syncSkin(){} // no-op: canvas drawPixelPet 已根据 skinMode 处理
 function applyGif(url){
   if(url){ petGif.src=url; petEl.classList.add("has-gif"); }
-  else{ syncSkin(); }
+  else{ petEl.classList.remove("has-gif"); }
 }
 let bubbleTimer=null;
 function say(text){
