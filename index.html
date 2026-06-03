@@ -534,6 +534,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
       <div class="chip"><span class="dot" id="modelDot"></span><span id="modelState">加载模型…</span></div>
       <div class="chip">关键点 <b id="lmCount">—</b></div>
       <div class="chip"><b id="fps">—</b> FPS</div>
+      <button class="btn sm ghost" id="skinToggle">🎨 邦布</button>
     </div>
   </header>
 
@@ -826,6 +827,7 @@ let faceLm=null, handLm=null;
 let running=false, modelsReady=false;
 let lastVideoTime=-1, frameCount=0;
 let calibrating=false;
+let skinMode="bangboo";   // "bangboo" | "pixel"
 let templates=[];          // {id,name,mood,bubble,emojis,particle,vec[],gifUrl}
 
 /* ---- 新增状态 ---- */
@@ -2125,10 +2127,14 @@ function applyMood(mood){
   const m=mood||"neutral";
   petEl.classList.add("mood-"+m);
   petMood=m;
-  // 自动切换邦布精灵
-  if(BANGBOO_SPRITES[m]){
-    petGif.src=BANGBOO_SPRITES[m];
+  syncSkin();
+}
+function syncSkin(){
+  if(skinMode==="bangboo" && BANGBOO_SPRITES[petMood]){
+    petGif.src=BANGBOO_SPRITES[petMood];
     petEl.classList.add("has-gif");
+  }else{
+    petEl.classList.remove("has-gif");
   }
 }
 function applyGif(url){
@@ -3055,12 +3061,30 @@ triggerYawn=function(){
   setTipOverride("😴","打哈欠～好困",2000);
 };
 
+/* ====================== 皮肤切换 ====================== */
+const SKIN_KEY="kc-skin-mode";
+function initSkinToggle(){
+  // 从 localStorage 读取
+  skinMode=localStorage.getItem(SKIN_KEY)||"bangboo";
+  updateSkinButton();
+  $("skinToggle").addEventListener("click",()=>{
+    skinMode=skinMode==="bangboo"?"pixel":"bangboo";
+    localStorage.setItem(SKIN_KEY,skinMode);
+    updateSkinButton();
+    syncSkin();
+  });
+}
+function updateSkinButton(){
+  $("skinToggle").textContent=skinMode==="bangboo"?"🎨 邦布":"👾 小克";
+}
+
 /* ====================== 启动 ====================== */
 buildMetrics();
 buildPresets();
 loadAll();
 renderTpls();
-applyMood("neutral"); // 启动时显示邦布中性精灵
+initSkinToggle();
+applyMood("neutral");
 updateHelpSection();
 initCheatSheet();
 // 启动像素宠物渲染循环
