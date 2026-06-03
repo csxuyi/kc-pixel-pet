@@ -387,6 +387,72 @@ details.help[open] summary .tri{transform:rotate(90deg)}
   30%{opacity:.7;transform:scale(1.3)}
   100%{opacity:0;transform:scale(2)}
 }
+
+/* ===== 新增: 凑太近退缩 ===== */
+@keyframes shrinkBack{
+  0%{transform:scale(1)}
+  40%{transform:scale(.82)}
+  100%{transform:scale(.88)}
+}
+#pet.shy-mode{animation:shrinkBack .4s ease-out forwards}
+
+/* ===== 新增: 打哈欠/犯困 ===== */
+@keyframes sleepyHead{
+  0%,100%{transform:translateY(0) rotate(0)}
+  30%{transform:translateY(3px) rotate(-3deg)}
+  60%{transform:translateY(1px) rotate(2deg)}
+  80%{transform:translateY(4px) rotate(-1deg)}
+}
+#pet.sleepy-mode{animation:sleepyHead 2s ease-in-out infinite}
+#pet.sleepy-mode .pet-canvas-wrap{filter:brightness(.85) saturate(.7)}
+
+/* ===== 新增: 举手模仿 ===== */
+@keyframes armUp{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-5%) scale(1.03,.97)}
+}
+#pet.pose-armsup{animation:armUp .7s ease-in-out 2}
+
+/* ===== 新增: 屏幕闪光 ===== */
+@keyframes screenFlash{
+  0%{opacity:0}
+  25%{opacity:.85}
+  100%{opacity:0}
+}
+.flash-overlay{
+  position:fixed; inset:0; z-index:200; pointer-events:none;
+  background:#fff; animation:screenFlash .35s ease-out forwards;
+}
+
+/* ===== 新增: 扩展状态指示器 ===== */
+.extra-status{
+  position:absolute; right:14px; top:88px; z-index:7;
+  display:flex; flex-direction:column; gap:5px;
+  font-family:"Space Mono",monospace; font-size:10.5px; font-weight:700;
+}
+.extra-status .srow{
+  background:rgba(255,253,248,.85); border:1.5px solid var(--line);
+  border-radius:10px; padding:5px 9px; display:flex; align-items:center; gap:6px;
+  backdrop-filter:blur(4px); color:var(--ink-soft); white-space:nowrap;
+  transition:border-color .25s, background .25s;
+}
+.extra-status .srow.hot{border-color:var(--coral); background:var(--coral-soft); color:var(--coral-d)}
+.extra-status .srow .sval{color:var(--ink); margin-left:auto}
+
+/* ===== 宠物视线微移 ===== */
+#pet.following .pet-canvas-wrap{transform:translateX(var(--gazeX,0px))}
+
+/* ===== Zzz 睡眠气泡 ===== */
+@keyframes floatZzz{
+  0%{opacity:0;transform:translate(0,0) scale(.5)}
+  30%{opacity:.9;transform:translate(8px,-20px) scale(1)}
+  100%{opacity:0;transform:translate(16px,-48px) scale(1.3)}
+}
+.zzz-emoji{
+  position:absolute; font-size:20px; pointer-events:none;
+  animation:floatZzz 2.2s ease-out forwards;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));
+}
 </style>
 </head>
 <body>
@@ -418,6 +484,13 @@ details.help[open] summary .tri{transform:rotate(90deg)}
           <div class="lab">当前表情</div>
           <div class="val" id="curExpr">—</div>
           <div class="sub" id="curSub">等待基准</div>
+        </div>
+        <div class="extra-status" id="extraStatus">
+          <div class="srow" id="srowGaze"><span>👁</span><span>视线</span><span class="sval" id="sGaze">—</span></div>
+          <div class="srow" id="srowState"><span>💤</span><span>状态</span><span class="sval" id="sState">—</span></div>
+          <div class="srow" id="srowDist"><span>🎯</span><span>距离</span><span class="sval" id="sDist">—</span></div>
+          <div class="srow" id="srowPose"><span>🤸</span><span>姿势</span><span class="sval" id="sPose">—</span></div>
+          <div class="srow" id="srowGest"><span>✋</span><span>手势</span><span class="sval" id="sGest">—</span></div>
         </div>
         <div class="pet-stack">
           <div class="floor-shadow" id="floorShadow"></div>
@@ -584,6 +657,26 @@ const EYEC  = {lOut:33, lIn:133, rIn:362, rOut:263};
 const KEY_IDX = [33,160,158,133,153,144, 362,385,387,263,373,380, 13,14,61,291, 105,159,334,386];
 const KEY_SET = new Set(KEY_IDX);
 const HAND_TIPS = [4,8,12,16,20];
+const HAND_PIP  = [3,7,11,15,19];  // 近端指间关节
+const HAND_MCP  = [2,6,10,14,18];  // 掌指关节
+const IRIS_L = 468, IRIS_R = 473;   // 虹膜中心
+const NOSE_TIP = 1;                  // 鼻尖
+
+/* ---- 新增各检测器阈值 ---- */
+const BLINK_EAR_THRESH = 0.10;       // EAR 低于此值为闭眼
+const BLINK_FRAMES_MIN = 2;          // 最短闭眼帧数 = 单眨眼
+const BLINK_FRAMES_MAX = 8;          // 超过为长闭眼
+const DOUBLE_BLINK_WINDOW = 420;     // 双眨眼时间窗 ms
+const YAWN_MOUTH = 0.42;             // 嘴张开度阈值
+const YAWN_DURATION = 1.1;           // 打哈欠持续秒
+const DIST_NEAR = 0.22;              // 双眼间距 < 此值 = 凑近
+const DIST_FAR = 0.10;               // 双眼间距 > 此值 = 远离
+const NOD_INTENSITY = 0.006;         // 点头 y 位移阈值
+const SHAKE_INTENSITY = 0.005;       // 摇头 x 位移阈值
+const LEAVE_TIMEOUT = 4000;          // 离场超时 ms
+const GAZE_THRESH = 0.025;           // 虹膜偏移阈值
+const KISS_DIST_THRESH = 0.04;       // 手指比心阈值
+const PEACE_TIP_DIST = 0.06;         // 比耶指尖距离阈值
 
 /* ---- 特征向量维度（顺序固定） ---- */
 const FEAT_ORDER = ["earL","earR","mouthOpen","mouthWidth","smileLift","browRaise","rollN"];
@@ -607,7 +700,7 @@ const PRESETS = [
   {name:"生气",  emoji:"😠", mood:"angry",    bubble:"哼！别闹啦！", emojis:"😠💢🔥", particle:"anger"},
   {name:"难过",  emoji:"🥺", mood:"sad",      bubble:"呜…抱抱我嘛", emojis:"🥺💧",   particle:"tear"},
 ];
-const MOOD_EMOJI = {neutral:"😐",happy:"😄",surprise:"😮",angry:"😠",sad:"🥺",kiss:"😘"};
+const MOOD_EMOJI = {neutral:"😐",happy:"😄",surprise:"😮",angry:"😠",sad:"🥺",kiss:"😘",sleepy:"😴",shy:"😳"};
 
 /* ---- 丰富气泡台词池 ---- */
 const BUBBLE_POOL = {
@@ -617,6 +710,8 @@ const BUBBLE_POOL = {
   angry:["哼！别闹啦！","生气了！","不跟你玩了 💢","哼唧唧","怒！"],
   sad:["呜…抱抱我嘛","有点难过…","陪我一会儿好不好","唉…","🥺"],
   kiss:["么么哒～","啾♡","mua～","亲一口就跑","💋"],
+  sleepy:["zzZ…好困呀","哈欠～","呼啊…想睡觉","眼皮打架了…","💤"],
+  shy:["诶嘿…别看我啦","好害羞…","/// 不要这样","呀！太近了啦"],
 };
 const PAT_BUBBLES = ["好舒服～","再摸摸嘛～","嘿嘿…🥰","呼噜呼噜～","轻一点啦～","被摸头了好开心"];
 const HUG_BUBBLES = ["抱抱～","好温暖！","紧紧抱住！","呜呜好感动","嘿嘿，抓到你了","贴贴～♡"];
@@ -641,6 +736,8 @@ const modelDot=$("modelDot"), modelState=$("modelState"), lmCount=$("lmCount"), 
 const faceBadge=$("faceBadge"), handBadge=$("handBadge"), camEmpty=$("camEmpty");
 const curExpr=$("curExpr"), curSub=$("curSub"), tipText=$("tipText"), tipIcon=$("tipIcon");
 const toastEl=$("toast");
+const sGaze=$("sGaze"), sState=$("sState"), sDist=$("sDist"), sPose=$("sPose"), sGest=$("sGest");
+const srowGaze=$("srowGaze"), srowState=$("srowState"), srowDist=$("srowDist"), srowPose=$("srowPose"), srowGest=$("srowGest");
 
 /* ====================== 状态 ====================== */
 let faceLm=null, handLm=null;
@@ -648,6 +745,17 @@ let running=false, modelsReady=false;
 let lastVideoTime=-1, frameCount=0;
 let calibrating=false;
 let templates=[];          // {id,name,mood,bubble,emojis,particle,vec[],gifUrl}
+
+/* ---- 新增状态 ---- */
+let gazeDir="center", gazeConfidence=0, lastGazeChange=0;
+let blinkFrames=0, blinkHistory=[], lastBlinkTime=0;
+let noseHistory=[], headMotionResult=null, lastHeadMotionTrig=0;
+let yawnStart=0, yawning=false, lastYawnTrig=0;
+let distanceStage="normal", distanceRaw=0, distanceSmooth=0, lastDistTrig=0;
+let faceGone=false, faceGoneSince=0, faceGoneTriggered=false;
+let poseLm=null, poseData=null, poseModelsReady=false;
+let gestureRecognizer=null, gestureModelsReady=false, lastGesture="", lastGestureTrig=0;
+let lastLeaveTime=0;
 let calibOffset=null;      // Float arrays of {x,y} length up to 478, normalized & scale-relative
 let calibFrozen=null;      // 冻结帧 (raw landmarks)
 let calibScale=1;
@@ -691,6 +799,363 @@ const SoundFX = (()=>{
     click(){ tone(1000,.02,"sine",.05); },
   };
 })();
+
+/* ====================== 新增: 注视追踪 ====================== */
+const GazeTracker = (()=>{
+  function compute(lm){
+    const lc=mid(lm[EYEC.lOut],lm[EYEC.lIn]);
+    const rc=mid(lm[EYEC.rIn],lm[EYEC.rOut]);
+    const li=lm[IRIS_L], ri=lm[IRIS_R];
+    if(!li||!ri) return {leftDir:"center",rightDir:"center",lookingAtScreen:true};
+    // 虹膜相对眼心的偏移
+    const ldx=(li.x-lc.x), ldy=(li.y-lc.y);
+    const rdx=(ri.x-rc.x), rdy=(ri.y-rc.y);
+    const avgX=(ldx+rdx)/2;
+    let dir="center";
+    if(Math.abs(avgX)>GAZE_THRESH){
+      dir = avgX>0 ? "right" : "left";
+    }
+    const lookingAtScreen = Math.abs(avgX)<GAZE_THRESH*1.4;
+    return {leftDir:ldx>GAZE_THRESH?"right":ldx<-GAZE_THRESH?"left":"center",
+            rightDir:rdx>GAZE_THRESH?"right":rdx<-GAZE_THRESH?"left":"center",
+            lookingAtScreen, offsetX:avgX};
+  }
+  return {compute};
+})();
+
+/* ====================== 新增: 眨眼检测 ====================== */
+const BlinkDetector = (()=>{
+  function feed(earAvg, now){
+    if(earAvg<BLINK_EAR_THRESH){
+      blinkFrames++;
+    }else{
+      if(blinkFrames>=BLINK_FRAMES_MIN && blinkFrames<=BLINK_FRAMES_MAX){
+        // 一次眨眼
+        blinkHistory.push(now);
+        if(blinkHistory.length>10) blinkHistory.shift();
+        // 检测双眨眼
+        if(blinkHistory.length>=2){
+          const prev=blinkHistory[blinkHistory.length-2];
+          if(now-prev<DOUBLE_BLINK_WINDOW){
+            blinkHistory=[]; blinkFrames=0;
+            return "double";
+          }
+        }
+        blinkFrames=0;
+        return blinkFrames>BLINK_FRAMES_MAX?"long":"single";
+      }else if(blinkFrames>BLINK_FRAMES_MAX){
+        blinkFrames=0;
+        return "long";
+      }
+      blinkFrames=0;
+    }
+    return null;
+  }
+  return {feed};
+})();
+
+/* ====================== 新增: 头部运动检测 ====================== */
+const HeadMotionDetector = (()=>{
+  const MAX_HIST=60;
+  function feed(lm, now){
+    const nose=lm[NOSE_TIP]; if(!nose) return null;
+    noseHistory.push({x:nose.x,y:nose.y,t:now});
+    if(noseHistory.length>MAX_HIST) noseHistory.shift();
+    if(noseHistory.length<15) return null;
+    // 分析近 0.8s 的运动
+    const cutoff=now-800;
+    const recent=noseHistory.filter(p=>p.t>cutoff);
+    if(recent.length<10) return null;
+    const xs=recent.map(p=>p.x), ys=recent.map(p=>p.y);
+    const xRange=Math.max(...xs)-Math.min(...xs);
+    const yRange=Math.max(...ys)-Math.min(...ys);
+    // 检测方向变化次数
+    let xDirChanges=0, yDirChanges=0;
+    let lastXDir=0, lastYDir=0;
+    for(let i=1;i<recent.length;i++){
+      const dx=recent[i].x-recent[i-1].x, dy=recent[i].y-recent[i-1].y;
+      const xd=Math.sign(dx), yd=Math.sign(dy);
+      if(xd!==0&&xd!==lastXDir){xDirChanges++;lastXDir=xd;}
+      if(yd!==0&&yd!==lastYDir){yDirChanges++;lastYDir=yd;}
+    }
+    if(yRange>NOD_INTENSITY&&yDirChanges>=2&&xRange<yRange*1.5){
+      return {type:"nod", intensity:yRange/NOD_INTENSITY};
+    }
+    if(xRange>SHAKE_INTENSITY&&xDirChanges>=2&&yRange<xRange*1.2){
+      return {type:"shake", intensity:xRange/SHAKE_INTENSITY};
+    }
+    return null;
+  }
+  return {feed};
+})();
+
+/* ====================== 新增: 打哈欠检测 ====================== */
+const YawnDetector = (()=>{
+  const COOLDOWN=8000;
+  function feed(mouthOpen, now){
+    if(mouthOpen>YAWN_MOUTH){
+      if(!yawnStart) yawnStart=now;
+      else if(now-yawnStart>YAWN_DURATION*1000 && !yawning && now-lastYawnTrig>COOLDOWN){
+        yawning=true; lastYawnTrig=now;
+        return true;
+      }
+    }else{
+      yawnStart=0; yawning=false;
+    }
+    // 持续张嘴但不足时长 → 不算
+    if(yawning && mouthOpen<YAWN_MOUTH*0.7){ yawning=false; yawnStart=0; }
+    return false;
+  }
+  return {feed};
+})();
+
+/* ====================== 新增: 人脸距离检测 ====================== */
+const DistanceDetector = (()=>{
+  const HIST=8, HYST_NEAR=0.88, HYST_FAR=1.12;
+  const D_COOLDOWN=2500;
+  let dHistory=[];
+  function feed(scale, now){
+    dHistory.push(scale);
+    if(dHistory.length>HIST) dHistory.shift();
+    distanceSmooth=dHistory.reduce((a,b)=>a+b,0)/dHistory.length;
+    distanceRaw=scale;
+    let prev=distanceStage;
+    if(distanceStage==="normal"){
+      if(distanceSmooth>DIST_NEAR*HYST_NEAR) distanceStage="near";
+      else if(distanceSmooth<DIST_FAR*HYST_FAR) distanceStage="far";
+    }else if(distanceStage==="near"){
+      if(distanceSmooth<DIST_NEAR*0.7) distanceStage="normal";
+    }else if(distanceStage==="far"){
+      if(distanceSmooth>DIST_FAR*1.3) distanceStage="normal";
+    }
+    if(distanceStage!==prev && now-lastDistTrig>D_COOLDOWN){
+      const result=distanceStage;
+      lastDistTrig=now;
+      return result;
+    }
+    return null;
+  }
+  return {feed};
+})();
+
+/* ====================== 新增: 离场/回来 ====================== */
+const PresenceDetector = (()=>{
+  function faceSeen(now){
+    if(faceGone && faceGoneTriggered && now-lastLeaveTime>5000){
+      // 回来了！
+      faceGone=false; faceGoneTriggered=false; faceGoneSince=0;
+      return "return";
+    }
+    faceGone=false; faceGoneTriggered=false; faceGoneSince=0;
+    return null;
+  }
+  function faceLost(now){
+    if(!faceGone){ faceGone=true; faceGoneSince=now; }
+    if(faceGone && !faceGoneTriggered && now-faceGoneSince>LEAVE_TIMEOUT){
+      faceGoneTriggered=true; lastLeaveTime=now;
+      return "leave";
+    }
+    return null;
+  }
+  return {faceSeen,faceLost};
+})();
+
+/* ====================== 新增: 扩展手势检测 ====================== */
+const ExtendedGestures = (()=>{
+  const THUMB_UP_ANGLE=0.55;
+  const COOLDOWN=1800;
+  function detect(hands, faceLm, now){
+    if(!hands||hands.length===0) return null;
+    if(now-lastGestureTrig<COOLDOWN&&lastGesture) return null;
+    const h=hands[0]; // 取第一只手
+    // 大拇指上翘: 拇指尖 y < 拇指 PIP y 且差值够大
+    if(h[4] && h[3]){
+      const thumbUp = (h[3].y-h[4].y);
+      const thumbLen = dist(h[4],h[3]);
+      // 拇指相对竖直且朝上
+      if(thumbUp>THUMB_UP_ANGLE*thumbLen && h[4].y<h[3].y){
+        // 检查其他手指弯曲
+        const fingersCurled = (
+          h[8]&&h[6]&&h[8].y>h[6].y && // 食指弯曲
+          h[12]&&h[10]&&h[12].y>h[10].y && // 中指弯曲
+          h[16]&&h[14]&&h[16].y>h[14].y // 无名指弯曲
+        );
+        if(fingersCurled){ lastGesture="thumbsUp"; lastGestureTrig=now; return "thumbsUp"; }
+      }
+    }
+    // 比耶: 食指和中指伸开，其余弯曲
+    if(h[8]&&h[6]&&h[12]&&h[10]&&h[16]&&h[14]&&h[20]&&h[18]){
+      const idxUp = h[8].y<h[6].y;
+      const midUp = h[12].y<h[10].y;
+      const ringDown = h[16].y>h[14].y;
+      const pinkyDown = h[20].y>h[18].y;
+      const tipDist = dist(h[8],h[12]);
+      if(idxUp&&midUp&&ringDown&&pinkyDown&&tipDist>PEACE_TIP_DIST*0.5&&tipDist<PEACE_TIP_DIST*3){
+        lastGesture="peaceSign"; lastGestureTrig=now; return "peaceSign";
+      }
+    }
+    // 手指比心: 拇指+食指指尖靠近
+    if(h[4]&&h[8]){
+      const d=dist(h[4],h[8]);
+      if(d<KISS_DIST_THRESH){
+        lastGesture="fingerHeart"; lastGestureTrig=now; return "fingerHeart";
+      }
+    }
+    // 指点点: 食指伸出，其余弯曲
+    if(h[8]&&h[6]&&h[12]&&h[10]){
+      const idxExtended = h[8].y<h[6].y-0.02;
+      const othersCurled = h[12].y>h[10].y && h[16]&&h[16].y>h[14].y && h[20]&&h[20].y>h[18].y;
+      if(idxExtended&&othersCurled){
+        const dir = h[8].x<h[6].x?"left":"right";
+        lastGesture="point"+dir; lastGestureTrig=now; return "point"+dir;
+      }
+    }
+    return null;
+  }
+  return {detect};
+})();
+
+/* ====================== 新增: 反应触发器 ====================== */
+function triggerGazeReaction(dir, looking, now){
+  if(dir!==gazeDir&&now-lastGazeChange>1500){
+    gazeDir=dir; lastGazeChange=now;
+    if(!looking){
+      petEl.classList.add("idle-tilt");
+      setTimeout(()=>petEl.classList.remove("idle-tilt"),1200);
+      say("嗯？你在看哪里呀？");
+      spawnEmojis("👀❓");
+    }else{
+      if(Math.random()<0.4) say(sayRandom("happy"));
+    }
+  }
+  // 更新视线跟随 (宠物小幅偏移)
+  if(looking){
+    petEl.classList.add("following");
+    const gx=GazeTracker.compute(lastFaceLandmarks);
+    petEl.style.setProperty("--gazeX",(gx.offsetX*80)+"px");
+  }else{
+    petEl.classList.remove("following");
+  }
+}
+
+function triggerBlinkReaction(type){
+  if(type==="single"){
+    if(Math.random()<0.5) say(["眨眼啦！","嘿！","看到你眨眼了哦～","😉"][Math.floor(Math.random()*4)]);
+    spawnEmojis("✨");
+    SoundFX.click();
+  }else if(type==="double"){
+    // 截屏闪光效果
+    const flash=document.createElement("div"); flash.className="flash-overlay";
+    document.body.appendChild(flash);
+    flash.addEventListener("animationend",()=>flash.remove());
+    say("咔嚓！📸");
+    spawnEmojis("📸✨💫");
+    SoundFX.happy();
+    FX.burst("sparkle",stage.clientWidth/2,stage.clientHeight/2,{count:30,big:true});
+  }else if(type==="long"){
+    say("zzZ…好困…");
+    petEl.classList.add("sleepy-mode");
+    setTimeout(()=>petEl.classList.remove("sleepy-mode"),3000);
+    FX.burst("tear",petCenter().x,petCenter().y-10,{count:8});
+  }
+}
+
+function triggerHeadMotion(result){
+  if(result.type==="nod"&&performance.now()-lastHeadMotionTrig>2000){
+    lastHeadMotionTrig=performance.now();
+    say("嗯嗯！对呀对呀～");
+    spawnEmojis("👍✨💚");
+    SoundFX.happy();
+    petEl.classList.add("mood-happy");
+    setTimeout(()=>petEl.classList.remove("mood-happy"),1200);
+  }else if(result.type==="shake"&&performance.now()-lastHeadMotionTrig>2000){
+    lastHeadMotionTrig=performance.now();
+    say("诶？不对不对～");
+    spawnEmojis("🤔❓");
+    SoundFX.surprise();
+    petEl.classList.add("idle-tilt");
+    setTimeout(()=>petEl.classList.remove("idle-tilt"),1500);
+  }
+}
+
+function triggerYawn(){
+  say(sayRandom(["哈欠～好困呀","zzZ…zzZ…","呼啊…","好想睡觉…"]));
+  spawnEmojis("😴💤");
+  petEl.classList.add("sleepy-mode");
+  setTimeout(()=>petEl.classList.remove("sleepy-mode"),3000);
+  const zzz=document.createElement("div"); zzz.className="zzz-emoji"; zzz.textContent="💤";
+  zzz.style.left=(petCenter().x-15)+"px"; zzz.style.top=(petCenter().y-60)+"px";
+  stage.appendChild(zzz); zzz.addEventListener("animationend",()=>zzz.remove());
+  SoundFX.sad();
+}
+
+function triggerDistanceReaction(stage){
+  if(stage==="near"){
+    say("哇！太近啦～");
+    petEl.classList.add("shy-mode");
+    setTimeout(()=>petEl.classList.remove("shy-mode"),800);
+    spawnEmojis("😳❗");
+    SoundFX.surprise();
+  }else if(stage==="far"){
+    say("别走太远呀，回来嘛～");
+    spawnEmojis("👋😢");
+    SoundFX.wave();
+  }
+}
+
+function triggerPoseReaction(poseType){
+  if(poseType==="armsUp"){
+    petEl.classList.add("pose-armsup");
+    setTimeout(()=>petEl.classList.remove("pose-armsup"),1400);
+    say("耶！你也举手啦～");
+    spawnEmojis("🙌✨");
+  }else if(poseType==="tiltHead"){
+    petEl.classList.add("idle-tilt");
+    setTimeout(()=>petEl.classList.remove("idle-tilt"),1200);
+  }
+}
+
+function triggerHandGestureReaction(gesture){
+  lastInteractionTime=performance.now();
+  if(gesture==="thumbsUp"){
+    say("被点赞了！开心～");
+    spawnEmojis("👍⭐💛");
+    FX.burst("star",petCenter().x,petCenter().y-15,{count:18,big:true});
+    SoundFX.happy();
+  }else if(gesture==="peaceSign"){
+    say("耶～✌️ 合照时间！");
+    spawnEmojis("✌️📸✨");
+    FX.burst("sparkle",petCenter().x,petCenter().y-10,{count:15});
+    SoundFX.click();
+  }else if(gesture==="fingerHeart"){
+    say("收到心心啦！💗");
+    spawnEmojis("🫶💗💕");
+    FX.burst("heart",petCenter().x,petCenter().y-10,{count:22,big:true});
+    SoundFX.kiss();
+    kissUntil=performance.now()+1500;
+    applyMood("kiss");
+    setTimeout(()=>{ if(performance.now()>=kissUntil){ if(currentTpl)applyReaction(currentTpl,false);else applyMood("neutral"); } },1600);
+  }else if(gesture==="pointLeft"||gesture==="pointRight"){
+    const dir=gesture==="pointLeft"?"左边":"右边";
+    say(`嗯？${dir}有什么？`);
+    petEl.style.setProperty("--gazeX",gesture==="pointLeft"?"-15px":"15px");
+    petEl.classList.add("following");
+    setTimeout(()=>petEl.classList.remove("following"),2000);
+  }
+}
+
+/* ---- 更新状态指示器 ---- */
+function updateStatusUI(){
+  sGaze.textContent=gazeDir==="center"?"屏幕中":gazeDir==="left"?"看左":"看右";
+  srowGaze.classList.toggle("hot",gazeDir!=="center");
+  sState.textContent=faceGone?"离场中":yawning?"打哈欠":blinkFrames>BLINK_FRAMES_MAX?"长闭眼":"活跃";
+  srowState.classList.toggle("hot",faceGone||yawning);
+  sDist.textContent=distanceStage==="near"?"太近":distanceStage==="far"?"太远":"适中";
+  srowDist.classList.toggle("hot",distanceStage!=="normal");
+  sPose.textContent=poseData?poseData.label:"—";
+  sGest.textContent=lastGesture||"—";
+  srowGest.classList.toggle("hot",!!lastGesture);
+}
 
 /* ====================== 工具 ====================== */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -738,9 +1203,9 @@ function loadAll(){
 /* ====================== 初始化模型 ====================== */
 async function initModels(){
   modelDot.className="dot busy"; modelState.textContent="加载模型…";
-  let vision, FaceLandmarker, HandLandmarker, FilesetResolver;
+  let vision, FaceLandmarker, HandLandmarker, FilesetResolver, PoseLandmarker, GestureRecognizer;
   try{
-    ({FaceLandmarker,HandLandmarker,FilesetResolver} = await import(`${CDN}/vision_bundle.mjs`));
+    ({FaceLandmarker,HandLandmarker,PoseLandmarker,GestureRecognizer,FilesetResolver} = await import(`${CDN}/vision_bundle.mjs`));
   }catch(e){
     modelDot.className="dot err"; modelState.textContent="脚本加载失败";
     showFatal("无法加载 MediaPipe","浏览器没能从 CDN 加载 <code>@mediapipe/tasks-vision</code>。<br>请检查网络后刷新；若在受限环境，请允许访问 <code>cdn.jsdelivr.net</code> 与 <code>storage.googleapis.com</code>。");
@@ -760,6 +1225,37 @@ async function initModels(){
     };
     try{ await mk("GPU"); }
     catch(gpuErr){ console.warn("GPU 失败，回退 CPU",gpuErr); await mk("CPU"); }
+
+    // ---- 新增: 加载 PoseLandmarker (后台加载，不影响基础功能) ----
+    try{
+      const pmk = async (delegate)=>{
+        poseLm = await PoseLandmarker.createFromOptions(vision,{
+          baseOptions:{
+            modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker/float16/1/pose_landmarker.task",
+            delegate
+          },
+          runningMode:"VIDEO", numPoses:1
+        });
+      };
+      try{ await pmk("GPU"); }catch(e){ await pmk("CPU"); }
+      poseModelsReady=true;
+    }catch(e){ console.warn("PoseLandmarker 加载失败",e); }
+
+    // ---- 新增: 加载 GestureRecognizer (后台加载) ----
+    try{
+      const gmk = async (delegate)=>{
+        gestureRecognizer = await GestureRecognizer.createFromOptions(vision,{
+          baseOptions:{
+            modelAssetPath:"https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+            delegate
+          },
+          runningMode:"VIDEO", numHands:2
+        });
+      };
+      try{ await gmk("GPU"); }catch(e){ await gmk("CPU"); }
+      gestureModelsReady=true;
+    }catch(e){ console.warn("GestureRecognizer 加载失败",e); }
+
   }catch(e){
     modelDot.className="dot err"; modelState.textContent="模型加载失败";
     showFatal("模型加载失败","无法下载 MediaPipe 模型权重。请检查网络（需访问 <code>storage.googleapis.com</code>）后刷新。");
@@ -823,25 +1319,145 @@ function loop(now){
     processFace(faceRes);
     if(handRes) processHand(handRes);
 
-    // FPS
-    fpsAcc+=dt; fpsN++;
-    if(fpsAcc>=0.5){ fpsEl.textContent=Math.round(fpsN/fpsAcc); fpsAcc=0; fpsN=0; }
+    // ---- 新增: PoseLandmarker 处理 (每 3 帧) ----
+    if(poseModelsReady && poseLm && frameCount%3===0){
+      try{
+        const poseRes=poseLm.detectForVideo(video,ts);
+        if(poseRes && poseRes.landmarks && poseRes.landmarks.length>0){
+          processPose(poseRes.landmarks[0], now);
+        }
+      }catch(e){}
+    }
+
+    // ---- 新增: GestureRecognizer 处理 (每 4 帧) ----
+    if(gestureModelsReady && gestureRecognizer && frameCount%4===0){
+      try{
+        const gestRes=gestureRecognizer.recognizeForVideo(video,ts);
+        if(gestRes && gestRes.gestures && gestRes.gestures.length>0){
+          processGesture(gestRes.gestures, now);
+        }
+      }catch(e){}
+      }
+
+      // FPS
+      fpsAcc+=dt; fpsN++;
+      if(fpsAcc>=0.5){ fpsEl.textContent=Math.round(fpsN/fpsAcc); fpsAcc=0; fpsN=0; }
   }
   // 脚下影子随心情轻微变化
   syncShadow();
 }
 
 /* ====================== 处理人脸 ====================== */
+/* ====================== 新增: 姿势处理 ====================== */
+function processPose(lm, now){
+  if(!lm||lm.length<25) return;
+  // 关键点: 11=左肩, 12=右肩, 13=左肘, 14=右肘, 15=左腕, 16=右腕, 23=左髋, 24=右髋, 0=鼻, 9=嘴, 10=嘴下
+  const lShoulder=lm[11], rShoulder=lm[12];
+  const lElbow=lm[13], rElbow=lm[14];
+  const lWrist=lm[15], rWrist=lm[16];
+  const nose=lm[0];
+  if(!lShoulder||!rShoulder) return;
+
+  const shoulderMid=mid(lShoulder,rShoulder);
+  const shoulderTilt=Math.atan2(rShoulder.y-lShoulder.y, rShoulder.x-lShoulder.x)*180/Math.PI;
+  let poseLabel="站立";
+
+  // 举手检测：腕部在肩部上方
+  const lArmUp=lWrist&&lWrist.y<lShoulder.y-0.08;
+  const rArmUp=rWrist&&rWrist.y<rShoulder.y-0.08;
+  if(lArmUp||rArmUp){
+    poseLabel=lArmUp&&rArmUp?"双手举起":"单手举起";
+    if(now-lastHeadMotionTrig>2500){
+      triggerPoseReaction("armsUp");
+      lastHeadMotionTrig=now;
+    }
+  }
+  // 耸肩：肩部明显倾斜
+  else if(Math.abs(shoulderTilt)>12){
+    poseLabel="歪头";
+    if(Math.abs(shoulderTilt)>18&&now-lastHeadMotionTrig>3000){
+      triggerPoseReaction("tiltHead");
+      lastHeadMotionTrig=now;
+    }
+  }
+
+  poseData={label:poseLabel, tilt:shoulderTilt, armsUp:lArmUp||rArmUp};
+}
+
+/* ====================== 新增: 手势识别处理 ====================== */
+function processGesture(gestures, now){
+  if(!gestures||gestures.length===0) return;
+  const top=gestures[0];
+  if(!top||!top[0]) return;
+  const category=top[0].categoryName;
+  const score=top[0].score;
+  if(score<0.65) return; // 低置信度忽略
+  if(category===lastGesture&&now-lastGestureTrig<2500) return; // 防抖
+
+  // 映射 GestureRecognizer 类别到反应
+  const GESTURE_MAP={
+    "Thumb_Up":"thumbsUp",
+    "Thumb_Down":"thumbsDown",
+    "Victory":"peaceSign",
+    "ILoveYou":"fingerHeart",
+    "Open_Palm":"wave",
+    "Pointing_Up":"pointUp",
+    "Closed_Fist":"fist",
+  };
+  const mapped=GESTURE_MAP[category];
+  if(mapped){
+    lastGesture=mapped; lastGestureTrig=now;
+    if(mapped==="thumbsUp"||mapped==="peaceSign"||mapped==="fingerHeart"){
+      triggerHandGestureReaction(mapped);
+    }else if(mapped==="thumbsDown"){
+      say("诶？不喜欢吗…");
+      spawnEmojis("😢");
+      SoundFX.sad();
+    }else if(mapped==="fist"){
+      say("加油！💪");
+      spawnEmojis("💪🔥");
+      SoundFX.happy();
+    }else if(mapped==="wave"){
+      triggerWave();
+    }
+  }
+}
+
 function processFace(res){
   const has = res && res.faceLandmarks && res.faceLandmarks.length>0;
   faceBadge.classList.toggle("on", !!has);
-  if(!has){ lmCount.textContent="0"; lastFaceLandmarks=null; if(!calibrating) drawOverlay(null); return; }
+  const now=performance.now();
+
+  if(!has){
+    lmCount.textContent="0"; lastFaceLandmarks=null;
+    if(!calibrating) drawOverlay(null);
+    const leaveResult=PresenceDetector.faceLost(now);
+    if(leaveResult==="leave"){
+      say("咦？人呢…");
+      spawnEmojis("😴💤");
+      const zzz=document.createElement("div"); zzz.className="zzz-emoji"; zzz.textContent="💤";
+      zzz.style.left="50%"; zzz.style.top="45%";
+      stage.appendChild(zzz); zzz.addEventListener("animationend",()=>zzz.remove());
+      SoundFX.sad();
+    }
+    updateStatusUI();
+    return;
+  }
 
   const raw = res.faceLandmarks[0];
-  lmCount.textContent=String(raw.length);            // 应为 478
+  lmCount.textContent=String(raw.length);
   lastFaceLandmarks = raw;
 
-  if(calibrating){ drawCalib(); return; }             // 校准时暂停识别
+  // 离场→回来检测
+  const presResult=PresenceDetector.faceSeen(now);
+  if(presResult==="return"){
+    say("你回来啦！我好想你～");
+    spawnEmojis("😍💕✨");
+    SoundFX.happy();
+    FX.burst("sparkle",petCenter().x,petCenter().y,{count:25,big:true});
+  }
+
+  if(calibrating){ drawCalib(); return; }
 
   const lm = applyCalibration(raw);
   const f  = computeFeatures(lm);
@@ -850,6 +1466,41 @@ function processFace(res){
 
   updateMetrics(vecToFeat(smoothVec));
   classify(smoothVec);
+
+  // ---- 新增: 注视追踪 ----
+  if(frameCount%3===0){
+    const gaze=GazeTracker.compute(lm);
+    const looking=gaze.lookingAtScreen;
+    if(!looking) gazeConfidence=Math.min(1,gazeConfidence+0.15);
+    else gazeConfidence=Math.max(0,gazeConfidence-0.1);
+    if(gazeConfidence>0.4){
+      const dir=Math.abs(gaze.offsetX)>GAZE_THRESH?(gaze.offsetX>0?"right":"left"):"center";
+      triggerGazeReaction(dir, looking, now);
+    }
+  }
+
+  // ---- 新增: 眨眼检测 ----
+  const earAvg=(f.earL+f.earR)/2;
+  const blinkResult=BlinkDetector.feed(earAvg, now);
+  if(blinkResult) triggerBlinkReaction(blinkResult);
+
+  // ---- 新增: 头部运动检测 ----
+  if(frameCount%2===0){
+    const hmResult=HeadMotionDetector.feed(lm, now);
+    if(hmResult) triggerHeadMotion(hmResult);
+  }
+
+  // ---- 新增: 打哈欠检测 ----
+  if(YawnDetector.feed(f.mouthOpen, now)) triggerYawn();
+
+  // ---- 新增: 人脸距离检测 ----
+  if(frameCount%4===0){
+    const distResult=DistanceDetector.feed(f.eyeDist||dist(mid(lm[EYEC.lOut],lm[EYEC.lIn]),mid(lm[EYEC.rIn],lm[EYEC.rOut])), now);
+    if(distResult) triggerDistanceReaction(distResult);
+  }
+
+  // ---- 新增: 状态 UI 更新 ----
+  if(frameCount%5===0) updateStatusUI();
 
   if($("showLm").checked) drawOverlay(lm); else drawOverlay(null);
 }
@@ -1158,6 +1809,22 @@ function drawEyes(mood, offsY){
     // 笑眯眼 (同 happy 的 ^^)
     ph(23+oy,18,24,PAL.eye); ph(24+oy,17,25,PAL.eye); ph(25+oy,17,25,PAL.eye);
     ph(23+oy,32,37,PAL.eye); ph(24+oy,31,38,PAL.eye); ph(25+oy,31,38,PAL.eye);
+  }else if(mood==="sleepy"){
+    // 犯困: 半闭下垂眼
+    ph(28+oy,18,24,PAL.eye); ph(27+oy,19,23,PAL.eyeW);
+    ph(28+oy,32,38,PAL.eye); ph(27+oy,33,37,PAL.eyeW);
+  }else if(mood==="shy"){
+    // 害羞: 大圆眼但略下垂, 往两边看
+    if(!blink){
+      for(let dy=-4;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){ if(dx*dx+dy*dy<=11) ps(21+dx,27+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(19+dx,27+dy+oy,PAL.eye); }
+      ps(19,25+oy,PAL.eyeW);
+      for(let dy=-4;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){ if(dx*dx+dy*dy<=11) ps(35+dx,27+dy+oy,PAL.eyeW); }
+      for(let dy=-1;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ ps(37+dx,27+dy+oy,PAL.eye); }
+      ps(37,25+oy,PAL.eyeW);
+    }else{
+      ph(28+oy,18,24,PAL.eye); ph(28+oy,32,38,PAL.eye);
+    }
   }else{
     // neutral: 正常圆眼
     if(!blink){
@@ -1177,11 +1844,13 @@ function drawEyes(mood, offsY){
 function drawBlush(mood, offsY){
   const oy=Math.round(offsY||0);
   if(mood==="angry") return; // 生气没腮红
-  const bCol=mood==="kiss"?PAL.heart:PAL.blush;
+  if(mood==="sleepy") return; // 犯困没腮红
+  const bCol=mood==="kiss"?PAL.heart:(mood==="shy"?PAL.heart:PAL.blush);
+  const size=mood==="shy"?3:2;
   // 左
-  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=5) ps(14+dx,35+dy+oy,bCol); }
+  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(14+dx,35+dy+oy,bCol); }
   // 右
-  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=5) ps(42+dx,35+dy+oy,bCol); }
+  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(42+dx,35+dy+oy,bCol); }
 }
 
 // --- 嘴 ---
@@ -1218,6 +1887,18 @@ function drawMouth(mood, offsY){
     ps(26,43+oy,PAL.heart); ps(30,43+oy,PAL.heart);
     ps(27,44+oy,PAL.heartLt); ps(28,44+oy,PAL.heart); ps(29,44+oy,PAL.heartLt);
     ps(28,45+oy,PAL.heart);
+  }else if(mood==="sleepy"){
+    // 打哈欠大嘴
+    for(let dy=-4;dy<=4;dy++) for(let dx=-4;dx<=4;dx++){ if(dx*dx+dy*dy<=20) ps(28+dx,43+dy+oy,PAL.mouth); }
+    // 小舌头
+    for(let y=46;y<=48;y++) for(let x=25;x<=31;x++){
+      if(y===46&&(x<26||x>30)) continue;
+      ps(x,y+oy,PAL.tongue);
+    }
+  }else if(mood==="shy"){
+    // 害羞小波浪嘴
+    ph(41+oy,25,26,PAL.mouth); ps(26,40+oy,PAL.mouth); ph(42+oy,25,26,PAL.mouth);
+    ph(41+oy,30,31,PAL.mouth); ps(30,40+oy,PAL.mouth); ph(42+oy,30,31,PAL.mouth);
   }
 }
 
@@ -1265,12 +1946,39 @@ function drawExtras(mood, offsY){
     const sy=16+oy;
     ps(sx,sy,"#ffc24a"); ps(sx,sy-1,"#fff");
   }
+  if(mood==="sleepy"){
+    // Zzz 冒泡
+    const zf=Math.floor(petFrame/10)%3;
+    if(zf===0){
+      const zx=38, zy=8+oy;
+      ps(zx,zy,"#6fb8e8"); ps(zx+1,zy,"#6fb8e8"); ps(zx+2,zy-1,"#6fb8e8");
+      ps(zx+3,zy,"#6fb8e8"); ps(zx+3,zy-2,"#6fb8e8"); ps(zx+4,zy-1,"#b0ddf7");
+    }else if(zf===1){
+      const zx=40, zy=4+oy;
+      ps(zx,zy,"#b0ddf7"); ps(zx+1,zy,"#b0ddf7"); ps(zx+2,zy-1,"#b0ddf7");
+      ps(zx+2,zy-3,"#b0ddf7"); ps(zx+3,zy-2,"#6fb8e8");
+    }
+    // 身体颜色变暗
+    for(let y=20;y<=45;y+=4){
+      const r=BODY_ROWS.find(r=>r[0]===y); if(!r) continue;
+      for(let x=r[1]+2;x<=r[2]-2;x+=3) ps(x,y+oy,"rgba(120,120,150,0.2)");
+    }
+  }
+  if(mood==="shy"){
+    // 额头竖线（害羞线）
+    for(let y=18;y<=22;y++){ ps(22,18+oy,"#ffb3a8"); ps(23,17+oy,"#ffb3a8"); ps(24,18+oy,"#ffb3a8"); }
+    ps(22,19+oy,PAL.blushDk); ps(23,18+oy,PAL.blushDk); ps(24,19+oy,PAL.blushDk);
+    // 冒小蒸汽
+    const stx=37+Math.round(Math.sin(petFrame*0.4)*2);
+    ps(stx,14+oy,"#ffe0e0"); ps(stx+1,13+oy,"#ffe0e0");
+    ps(stx+3,15+oy,"#ffd0d0");
+  }
 }
 
 // --- 主绘制 ---
 function drawPixelPet(mood, frame){
   pctx.clearRect(0,0,56,66);
-  const offsY = mood==="sad"?1:0; // 难过时略下沉
+  const offsY = mood==="sad"?1: (mood==="sleepy"?2:0); // 难过/犯困时略下沉
   // 拥抱暖光
   if(petExtra==="hug"){
     for(let i=0;i<6;i++){
@@ -1417,6 +2125,13 @@ function processHand(res){
   const eyeL = mid(fc[EYEC.lOut], fc[EYEC.lIn]);
   const eyeR = mid(fc[EYEC.rIn], fc[EYEC.rOut]);
   const faceMidY = (eyeL.y+eyeR.y)/2;
+
+  // ====== 0. 扩展手势检测 ======
+  const extGest=ExtendedGestures.detect(hands, fc, now);
+  if(extGest){
+    triggerHandGestureReaction(extGest);
+    return; // 扩展手势优先，不触发飞吻/摸头/拥抱/挥手
+  }
 
   // 找最近手
   let bestD=Infinity, bestP=null, bestH=null;
