@@ -534,7 +534,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
       <div class="chip"><span class="dot" id="modelDot"></span><span id="modelState">加载模型…</span></div>
       <div class="chip">关键点 <b id="lmCount">—</b></div>
       <div class="chip"><b id="fps">—</b> FPS</div>
-      <button class="btn sm ghost" id="skinToggle">🎨 邦布</button>
+      <button class="btn sm" id="skinToggle" style="background:var(--sun-soft);border-color:var(--sun);font-weight:800">🎨 邦布模式</button>
     </div>
   </header>
 
@@ -2062,11 +2062,16 @@ function drawExtras(mood, offsY){
 // --- 主绘制 ---
 function drawPixelPet(mood, frame){
   pctx.clearRect(0,0,56,66);
-  // 邦布模式：直接画预加载的精灵图
+  // 邦布模式
   if(skinMode==="bangboo"){
     const img=BANGBOO_IMGS[mood]||BANGBOO_IMGS.neutral;
-    if(img&&img.complete&&img.naturalWidth>0){
+    if(img&&bangbooReady){
       pctx.drawImage(img,0,0,56,66);
+    }else{
+      // 图片未加载完时显示加载中
+      pctx.fillStyle="#f7efe0";pctx.fillRect(0,0,56,66);
+      pctx.fillStyle="#ccc";pctx.font="8px sans-serif";pctx.textAlign="center";
+      pctx.fillText("...",28,36);
     }
     return;
   }
@@ -2128,12 +2133,18 @@ function petRenderLoop(){
 }
 
 /* ====================== 邦布精灵 (base64) ====================== */
-/* ---- 邦布精灵预加载 ---- */
+/* ---- 邦布精灵预加载 (带加载状态追踪) ---- */
 const BANGBOO_IMGS={};
+let bangbooReady=false;
 (function preloadBangboo(){
   const paths={neutral:"images/neutral.png",happy:"images/happy.png",surprise:"images/surprise.png",angry:"images/angry.png",sad:"images/sad.png",kiss:"images/kiss.png",sleepy:"images/sleepy.png",shy:"images/shy.png"};
+  let loaded=0, total=Object.keys(paths).length;
   for(const [mood,src] of Object.entries(paths)){
     const img=new Image();
+    img.onload=img.onerror=()=>{
+      loaded++;
+      if(loaded>=total) bangbooReady=true;
+    };
     img.src=src;
     BANGBOO_IMGS[mood]=img;
   }
@@ -2146,7 +2157,10 @@ function applyMood(mood){
   petEl.classList.add("mood-"+m);
   petMood=m;
 }
-function syncSkin(){} // no-op: canvas drawPixelPet 已根据 skinMode 处理
+function syncSkin(){
+  // canvas 每帧自动根据 skinMode 绘制, 无需额外操作
+  updateSkinButton();
+}
 function applyGif(url){
   if(url){ petGif.src=url; petEl.classList.add("has-gif"); }
   else{ petEl.classList.remove("has-gif"); }
@@ -2970,6 +2984,7 @@ const TIP_POOL = [
   {icon:"👁",cond:()=>running&&!lastFaceLandmarks, text:"把脸对准摄像头哦～"},
   {icon:"🎮",cond:()=>running, text:"左下角 ? 按钮查看全部手势速查～"},
   {icon:"💡",cond:()=>running&&templates.length>0, text:"凑近我、远离我、打个哈欠试试？"},
+  {icon:"🔄",cond:()=>true, text:"顶部「邦布模式」按钮可切换精灵/像素皮肤～"},
 ];
 function startTipRotation(){
   if(tipInterval) clearInterval(tipInterval);
@@ -3074,18 +3089,21 @@ triggerYawn=function(){
 /* ====================== 皮肤切换 ====================== */
 const SKIN_KEY="kc-skin-mode";
 function initSkinToggle(){
-  // 从 localStorage 读取
   skinMode=localStorage.getItem(SKIN_KEY)||"bangboo";
   updateSkinButton();
   $("skinToggle").addEventListener("click",()=>{
     skinMode=skinMode==="bangboo"?"pixel":"bangboo";
     localStorage.setItem(SKIN_KEY,skinMode);
     updateSkinButton();
-    syncSkin();
+    toast(skinMode==="bangboo"?"已切换为 🎨 邦布精灵":"已切换为 👾 像素小克",1500);
+    SoundFX.click();
   });
 }
 function updateSkinButton(){
-  $("skinToggle").textContent=skinMode==="bangboo"?"🎨 邦布":"👾 小克";
+  $("skinToggle").textContent=skinMode==="bangboo"?"🎨 邦布模式":"👾 小克模式";
+  $("skinToggle").style.background=skinMode==="bangboo"?"var(--sun-soft)":"var(--mint-soft)";
+  $("skinToggle").style.borderColor=skinMode==="bangboo"?"var(--sun)":"var(--mint)";
+}
 }
 
 /* ====================== 启动 ====================== */
