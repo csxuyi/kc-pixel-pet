@@ -2139,7 +2139,7 @@ function syncSkin(){
 }
 function applyGif(url){
   if(url){ petGif.src=url; petEl.classList.add("has-gif"); }
-  else{ petEl.classList.remove("has-gif"); }
+  else{ syncSkin(); }
 }
 let bubbleTimer=null;
 function say(text){
