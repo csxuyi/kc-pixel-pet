@@ -453,6 +453,68 @@ details.help[open] summary .tri{transform:rotate(90deg)}
   animation:floatZzz 2.2s ease-out forwards;
   filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));
 }
+
+/* ===== 引导轮播 (Onboarding Wizard) ===== */
+.onboard-overlay{
+  position:fixed; inset:0; z-index:300; background:rgba(45,39,34,.72);
+  display:grid; place-items:center; padding:24px;
+  animation:fadeIn .35s ease-out;
+  backdrop-filter:blur(4px);
+}
+.onboard-card{
+  background:var(--card); border:2px solid var(--line); border-radius:22px;
+  padding:30px 28px 24px; max-width:380px; width:100%;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.55);
+  text-align:center; position:relative;
+  animation:onboardIn .4s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes onboardIn{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+.onboard-card .ob-emoji{font-size:56px; line-height:1; margin-bottom:10px; animation:bounce .55s ease-in-out}
+.onboard-card h3{font-family:"Fredoka",sans-serif; font-size:19px; margin:0 0 7px; color:var(--ink)}
+.onboard-card p{font-size:13px; color:var(--ink-soft); line-height:1.65; margin:0 0 18px}
+.onboard-card .ob-dots{display:flex; gap:7px; justify-content:center; margin-bottom:20px}
+.onboard-card .ob-dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:all .25s}
+.onboard-card .ob-dot.cur{background:var(--mint);transform:scale(1.3);box-shadow:0 0 8px rgba(31,185,163,.5)}
+.onboard-card .ob-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+.onboard-card .ob-actions button{font-family:inherit; font-weight:800; font-size:13px; padding:10px 18px; border-radius:12px; cursor:pointer; transition:all .12s; border:1.5px solid var(--line)}
+.onboard-card .ob-skip{background:transparent; color:var(--ink-soft); border-style:dashed}
+.onboard-card .ob-skip:hover{background:var(--card-2)}
+.onboard-card .ob-prev{background:var(--card-2); color:var(--ink)}
+.onboard-card .ob-next{background:var(--mint); color:#fff; border-color:var(--mint-d)}
+.onboard-card .ob-next:hover{background:#3ccdb7}
+.onboard-card .ob-next:active{transform:scale(.96)}
+
+/* ===== 手势速查面板 ===== */
+.help-btn{
+  position:absolute; left:14px; top:14px; z-index:8;
+  width:34px; height:34px; border-radius:50%; border:2px solid var(--line);
+  background:var(--card); color:var(--ink-soft); font-weight:800; font-size:18px;
+  display:grid; place-items:center; cursor:pointer; user-select:none;
+  box-shadow:0 3px 8px -4px rgba(var(--shadow),.4);
+  transition:all .15s; line-height:1;
+}
+.help-btn:hover{transform:scale(1.1); border-color:var(--mint); color:var(--mint-d)}
+.cheat-sheet{
+  position:absolute; left:14px; top:54px; z-index:9;
+  background:rgba(255,253,248,.96); border:2px solid var(--line);
+  border-radius:16px; padding:16px; max-width:240px;
+  box-shadow:0 16px 40px -16px rgba(var(--shadow),.7);
+  backdrop-filter:blur(8px);
+  display:none; animation:onboardIn .25s ease-out;
+}
+.cheat-sheet.show{display:block}
+.cheat-sheet h4{font-family:"Fredoka",sans-serif; font-size:13px; margin:0 0 10px; color:var(--ink); text-align:center}
+.cheat-sheet .ch-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:6px;
+}
+.cheat-sheet .ch-item{
+  display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700;
+  color:var(--ink-soft); padding:5px 7px; border-radius:8px; background:var(--card-2);
+  transition:background .12s;
+}
+.cheat-sheet .ch-item:hover{background:var(--mint-soft); color:var(--ink)}
+.cheat-sheet .ch-item .chi{font-size:16px; flex:none; width:22px; text-align:center}
+.cheat-sheet .ch-close{display:block; margin:10px auto 0; font-size:11px; font-weight:800; color:var(--ink-faint); background:none; border:none; cursor:pointer}
 </style>
 </head>
 <body>
@@ -484,6 +546,26 @@ details.help[open] summary .tri{transform:rotate(90deg)}
           <div class="lab">当前表情</div>
           <div class="val" id="curExpr">—</div>
           <div class="sub" id="curSub">等待基准</div>
+        </div>
+        <!-- 手势速查按钮 & 面板 -->
+        <div class="help-btn" id="helpBtn" title="手势速查">?</div>
+        <div class="cheat-sheet" id="cheatSheet">
+          <h4>🎮 手势 & 互动速查</h4>
+          <div class="ch-grid">
+            <div class="ch-item"><span class="chi">👍</span>点赞</div>
+            <div class="ch-item"><span class="chi">✌️</span>比耶</div>
+            <div class="ch-item"><span class="chi">🫶</span>手指比心</div>
+            <div class="ch-item"><span class="chi">☝️</span>指点点</div>
+            <div class="ch-item"><span class="chi">✋</span>摸头</div>
+            <div class="ch-item"><span class="chi">🤗</span>双手拥抱</div>
+            <div class="ch-item"><span class="chi">💋</span>飞吻</div>
+            <div class="ch-item"><span class="chi">👋</span>挥手</div>
+            <div class="ch-item"><span class="chi">👀</span>注视屏幕</div>
+            <div class="ch-item"><span class="chi">😉</span>眨眼</div>
+            <div class="ch-item"><span class="chi">😮</span>打哈欠</div>
+            <div class="ch-item"><span class="chi">🙌</span>举手模仿</div>
+          </div>
+          <button class="ch-close" id="chClose">收起 ✕</button>
         </div>
         <div class="extra-status" id="extraStatus">
           <div class="srow" id="srowGaze"><span>👁</span><span>视线</span><span class="sval" id="sGaze">—</span></div>
@@ -2798,17 +2880,195 @@ $("showLm").addEventListener("change", ()=>{
   if(!$("showLm").checked && !calibrating) drawOverlay(null);
 });
 
+/* ====================== 引导轮播 ====================== */
+const ONBOARD_STEPS = [
+  {emoji:"👋", title:"欢迎来到小克表情桌宠！", text:"小克是一只像素风桌面宠物，能实时识别你的<b>表情</b>、<b>手势</b>和<b>身体姿势</b>，并做出可爱的反应！"},
+  {emoji:"🙂", title:"录几个表情试试", text:"对镜头做不同表情（中性/开心/惊讶/生气/难过），点右侧<b>预设按钮</b>或填名字后点<b>录制</b>。小克就会自动跟着你的表情变啦～"},
+  {emoji:"👀", title:"脸部互动", text:"<b>盯着屏幕</b>小克会回看你；快速<b>眨眼</b>可以截屏闪光；<b>点头/摇头</b>它会回应；<b>打哈欠</b>它也跟着犯困；<b>凑近/远离</b>摄像头看看什么反应？"},
+  {emoji:"✋", title:"手势互动", text:"试试这些手势：<b>👍点赞</b>、<b>✌️比耶</b>、<b>🫶手指比心</b>、<b>☝️指点点</b>；还有<b>飞吻</b>（手靠近嘴再推开）、<b>摸头</b>、<b>挥手</b>、<b>双手拥抱</b>。"},
+  {emoji:"🤸", title:"准备好了吗？", text:"点击<b>「开启摄像头」</b>开始，允许摄像头权限。舞台左下角的 <b>?</b> 按钮随时可以查看手势速查表。玩得开心！🎉"},
+];
+let onboardStep=0;
+const ONBOARD_KEY="kc-onboard-v2";
+
+function showOnboard(){
+  if(localStorage.getItem(ONBOARD_KEY)) return;
+  const ov=$("onboardOverlay"), card=$("onboardCard");
+  ov.style.display="grid";
+  function render(){
+    const s=ONBOARD_STEPS[onboardStep];
+    card.innerHTML=`
+      <div class="ob-emoji">${s.emoji}</div>
+      <h3>${s.title}</h3>
+      <p>${s.text}</p>
+      <div class="ob-dots">${ONBOARD_STEPS.map((_,i)=>`<div class="ob-dot${i===onboardStep?' cur':''}"></div>`).join("")}</div>
+      <div class="ob-actions">
+        <button class="ob-skip" id="obSkip">跳过</button>
+        ${onboardStep>0?'<button class="ob-prev" id="obPrev">上一步</button>':''}
+        ${onboardStep<ONBOARD_STEPS.length-1?'<button class="ob-next" id="obNext">下一步</button>':'<button class="ob-next" id="obDone">开始体验 🚀</button>'}
+      </div>`;
+    bindBtns();
+  }
+  function bindBtns(){
+    const skip=card.querySelector("#obSkip"), prev=card.querySelector("#obPrev"),
+          next=card.querySelector("#obNext"), done=card.querySelector("#obDone");
+    skip&&skip.addEventListener("click",closeOnboard);
+    prev&&prev.addEventListener("click",()=>{onboardStep--;render();SoundFX.click();});
+    next&&next.addEventListener("click",()=>{onboardStep++;render();SoundFX.click();});
+    done&&done.addEventListener("click",()=>{closeOnboard();if(!running&&modelsReady)startCamera();});
+  }
+  function closeOnboard(){
+    ov.style.display="none"; localStorage.setItem(ONBOARD_KEY,"1");
+  }
+  render();
+}
+
+/* ====================== 手势速查面板 ====================== */
+function initCheatSheet(){
+  const btn=$("helpBtn"), sheet=$("cheatSheet"), close=$("chClose");
+  btn.addEventListener("click",()=>{sheet.classList.toggle("show");SoundFX.click();});
+  close.addEventListener("click",()=>{sheet.classList.remove("show")});
+  // 点击舞台其他位置关闭
+  stage.addEventListener("click",e=>{
+    if(!sheet.classList.contains("show")) return;
+    if(!sheet.contains(e.target) && e.target!==btn){
+      sheet.classList.remove("show");
+    }
+  });
+}
+
+/* ====================== 上下文场景提示 ====================== */
+let tipInterval=null, tipOverride=null;
+const TIP_POOL = [
+  {icon:"👀",cond:()=>!running, text:"点击「开启摄像头」开始互动吧 ✨"},
+  {icon:"🎭",cond:()=>running&&templates.length===0, text:"对镜头做表情后，点预设按钮录制吧！"},
+  {icon:"✨",cond:()=>running&&templates.length>0, text:"试试对我眨眼、点头、做手势吧！"},
+  {icon:"👁",cond:()=>running&&!lastFaceLandmarks, text:"把脸对准摄像头哦～"},
+  {icon:"🎮",cond:()=>running, text:"左下角 ? 按钮查看全部手势速查～"},
+  {icon:"💡",cond:()=>running&&templates.length>0, text:"凑近我、远离我、打个哈欠试试？"},
+];
+function startTipRotation(){
+  if(tipInterval) clearInterval(tipInterval);
+  let idx=0;
+  tipInterval=setInterval(()=>{
+    if(tipOverride){ // 有覆盖提示优先
+      return;
+    }
+    const pool=TIP_POOL.filter(t=>t.cond());
+    if(pool.length===0) return;
+    idx=idx%pool.length;
+    const t=pool[idx];
+    tipIcon.textContent=t.icon; tipText.textContent=t.text;
+    idx++;
+  },7000);
+  // 初始显示第一条匹配的
+  const first=TIP_POOL.find(t=>t.cond());
+  if(first){tipIcon.textContent=first.icon;tipText.textContent=first.text;}
+}
+function setTipOverride(icon,text,duration=2500){
+  tipOverride=true; tipIcon.textContent=icon; tipText.textContent=text;
+  clearTimeout(tipOverride._tid);
+  tipOverride._tid=setTimeout(()=>{tipOverride=false;},duration);
+}
+
+// 修改 say 函数，让气泡出现时临时覆盖 tip
+const _sayOrig=say;
+say=function(text){
+  _sayOrig(text);
+  if(text) setTipOverride("💬",text,2600);
+};
+
+/* ====================== 更新帮助区 ====================== */
+function updateHelpSection(){
+  const help=document.querySelector("details.help .help-body");
+  if(!help) return;
+  help.innerHTML=`
+    <ol>
+      <li><b>开启摄像头</b>，等模型加载完（顶部圆点变绿）。</li>
+      <li>对镜头做一个表情，点对应<b>预设</b>或填名字后<b>录制</b>，保持约 0.5s。</li>
+      <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），小克就会实时跟着切换。</li>
+      <li>点某条基准可<b>编辑</b>它的心情 / 台词 / emoji / 粒子 / GIF。</li>
+      <li>关键点有偏移就进<b>校准模式</b>拖一拖。</li>
+    </ol>
+    <b style="display:block;margin-top:12px">🎮 手势与互动</b>
+    <ol style="margin-top:4px">
+      <li>✋ <b>飞吻</b>：手靠近嘴边再向外推开</li>
+      <li>✋ <b>摸头</b>：手放在额头区域再向下轻压</li>
+      <li>🤗 <b>拥抱</b>：双手靠近胸前</li>
+      <li>👋 <b>挥手</b>：手在脸前左右摆动 3 次</li>
+      <li>👍 <b>点赞</b> / ✌️ <b>比耶</b> / 🫶 <b>手指比心</b> / ☝️ <b>指点点</b></li>
+      <li>🙌 <b>举手</b>：小克会跟着举手！</li>
+    </ol>
+    <b style="display:block;margin-top:12px">👀 脸部小互动</b>
+    <ol style="margin-top:4px">
+      <li><b>注视</b>屏幕小克会回看，看别处它会歪头</li>
+      <li>快速<b>双眨眼</b>可触发截屏闪光 📸</li>
+      <li>连续<b>点头</b>/<b>摇头</b>小克有反应</li>
+      <li><b>打哈欠</b>小克跟着犯困 💤</li>
+      <li><b>凑近</b>摄像头小克害羞，<b>远离</b>它会招手</li>
+      <li>离开摄像头 4 秒再回来，小克会惊喜！</li>
+    </ol>
+  `;
+}
+
+/* ====================== 更新舞台提示（跟随手势反馈） ===== */
+const _origTriggerHandGesture=triggerHandGestureReaction;
+triggerHandGestureReaction=function(gesture){
+  _origTriggerHandGesture(gesture);
+  const GEST_LABELS={thumbsUp:"👍 点赞收到！",peaceSign:"✌️ 比耶～咔嚓！",fingerHeart:"🫶 心心收到！",pointLeft:"☝️ 指那边？",pointRight:"☝️ 看那边？"};
+  if(GEST_LABELS[gesture]) setTipOverride("✋",GEST_LABELS[gesture],2200);
+};
+const _origTriggerBlink=triggerBlinkReaction;
+triggerBlinkReaction=function(type){
+  _origTriggerBlink(type);
+  if(type==="double") setTipOverride("📸","双眨眼截屏！",2000);
+  else if(type==="long") setTipOverride("😴","长闭眼～一起睡",2000);
+};
+const _origTriggerHead=triggerHeadMotion;
+triggerHeadMotion=function(result){
+  _origTriggerHead(result);
+  if(result.type==="nod") setTipOverride("🙂","点头收到！",1800);
+  else if(result.type==="shake") setTipOverride("🤔","摇头收到！",1800);
+};
+const _origTriggerDist=triggerDistanceReaction;
+triggerDistanceReaction=function(stage){
+  _origTriggerDist(stage);
+  if(stage==="near") setTipOverride("😳","太近啦！小克害羞",2000);
+  else if(stage==="far") setTipOverride("👋","别走太远～",2000);
+};
+const _origTriggerPose=triggerPoseReaction;
+triggerPoseReaction=function(type){
+  _origTriggerPose(type);
+  if(type==="armsUp") setTipOverride("🙌","举手模仿！",2000);
+};
+const _origTriggerYawn=triggerYawn;
+triggerYawn=function(){
+  _origTriggerYawn();
+  setTipOverride("😴","打哈欠～好困",2000);
+};
+
 /* ====================== 启动 ====================== */
 buildMetrics();
 buildPresets();
 loadAll();
 renderTpls();
+updateHelpSection();
+initCheatSheet();
 // 启动像素宠物渲染循环
 petRenderLoop();
 // 自动开始加载模型
 initModels().catch(()=>{});
+// 显示引导 + 启动上下文提示轮播
+showOnboard();
+startTipRotation();
 // 如果本地已有基准，重新计算标准差
 if(templates.length>0) recomputeStd();
 </script>
+
+<!-- ===== 引导轮播 (Onboarding Wizard) ===== -->
+<div class="onboard-overlay" id="onboardOverlay" style="display:none">
+<div class="onboard-card" id="onboardCard"></div>
+</div>
+
 </body>
 </html>
