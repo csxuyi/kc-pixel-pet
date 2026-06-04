@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>小克 · 表情桌宠</title>
+<title>Clawd · Claude 表情桌宠 🦀</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -128,7 +128,7 @@ header{
   background:radial-gradient(closest-side, rgba(90,65,30,.32), transparent 78%);
   z-index:-1; transition:transform .2s, opacity .2s;
 }
-/* ===== 像素小克 ===== */
+/* ===== 像素螃蟹 ===== */
 #pet{position:relative; width:100%; will-change:transform; transform-origin:center bottom;}
 .pet-canvas-wrap{position:relative; width:100%;}
 #petCanvas{
@@ -586,8 +586,8 @@ details.help[open] summary .tri{transform:rotate(90deg)}
         <svg viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="22" rx="14" ry="13.5" fill="#fff"/><circle cx="15" cy="20" r="2.4" fill="#2d2722"/><circle cx="25" cy="20" r="2.4" fill="#2d2722"/><path d="M16 26 Q20 29 24 26" stroke="#2d2722" stroke-width="2" stroke-linecap="round"/><path d="M20 8 Q23 3 27 6 Q24 9 20 8Z" fill="#36ccb4"/><circle cx="11" cy="24" r="2" fill="#ffb3a8"/><circle cx="29" cy="24" r="2" fill="#ffb3a8"/></svg>
       </div>
       <div>
-        <h1>小克 · 表情桌宠</h1>
-        <p>像素风 Pixel Pet · MediaPipe Face Mesh 实时表情驱动</p>
+        <h1>Clawd · 表情桌宠 🦀</h1>
+        <p>像素螃蟹 Pixel Crab · MediaPipe Face Mesh 实时表情驱动</p>
       </div>
     </div>
     <div class="spacer"></div>
@@ -595,7 +595,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
       <div class="chip"><span class="dot" id="modelDot"></span><span id="modelState">加载模型…</span></div>
       <div class="chip">关键点 <b id="lmCount">—</b></div>
       <div class="chip"><b id="fps">—</b> FPS</div>
-      <button class="btn sm" id="skinToggle" style="background:var(--sun-soft);border-color:var(--sun);font-weight:800">🎨 邦布模式</button>
+      <button class="btn sm" id="skinToggle" style="background:var(--sun-soft);border-color:var(--sun);font-weight:800">🎨 精灵模式</button>
     </div>
   </header>
 
@@ -645,7 +645,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
           <div id="pet" class="mood-neutral">
             <img class="kc-gif" id="petGif" alt="" />
             <div class="pet-canvas-wrap">
-              <canvas id="petCanvas" width="56" height="66" aria-label="小克像素宠物"></canvas>
+              <canvas id="petCanvas" width="56" height="66" aria-label="Clawd 螃蟹宠物"></canvas>
             </div>
           </div>
         </div>
@@ -695,7 +695,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
         <div class="editor" id="editor">
           <div class="ed-grid">
             <label>名称</label><input type="text" id="edName" maxlength="14"/>
-            <label>小克心情</label>
+            <label>Clawd 心情</label>
             <select id="edMood">
               <option value="neutral">😐 中性</option>
               <option value="happy">😄 开心</option>
@@ -727,7 +727,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
             <button class="btn sm mint" id="edTest">▶ 预览反应</button>
             <button class="btn sm" id="edDelete" style="margin-left:auto; color:var(--coral-d); border-color:var(--coral)">删除该基准</button>
           </div>
-          <small class="note">GIF 用本地文件即时生效（不上传），用于把小克换成你自己的素材；导出数据时不含 GIF。</small>
+          <small class="note">GIF 用本地文件即时生效（不上传），用于把 Clawd 换成你自己的素材；导出数据时不含 GIF。</small>
         </div>
         <small class="note">建议先录一个「中性」，再录其它表情。识别用归一化欧氏距离做最近邻，并带时间去抖。</small>
       </div>
@@ -761,7 +761,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
             <ol>
               <li><b>开启摄像头</b>，等模型加载完（顶部圆点变绿）。</li>
               <li>对镜头做一个表情，点对应<b>预设</b>或填名字后<b>录制</b>，保持 0.6s。</li>
-              <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），小克就会实时跟着切换。</li>
+              <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），Clawd就会实时跟着切换。</li>
               <li><b>飞吻</b>：把手靠近嘴边再向外推开 → 触发爱心。（独立于表情识别）</li>
               <li>点某条基准可<b>编辑</b>它的心情 / 台词 / emoji / 粒子 / GIF。</li>
               <li>关键点有偏移就进<b>校准模式</b>拖一拖。</li>
@@ -785,10 +785,10 @@ details.help[open] summary .tri{transform:rotate(90deg)}
 
 <script type="module">
 /* ======================================================================
-   小克 · 表情桌宠
+   Clawd · 表情桌宠 🦀
    - MediaPipe Tasks Vision: FaceLandmarker(478) + HandLandmarker(21)
    - 几何特征 → 归一化向量 → 对已录基准做最近邻 → 当前表情
-   - 表情驱动：小克心情/GIF + 浮动 emoji + 气泡 + 粒子
+   - 表情驱动：Clawd 心情/GIF + 浮动 emoji + 气泡 + 粒子
    - 手部独立飞吻逻辑；校准模式拖拽关键点修正偏移
    ====================================================================== */
 
@@ -1753,18 +1753,19 @@ function commitExpr(tpl){
   discover("expr_"+tpl.mood);
 }
 
-/* ====================== 像素小克渲染器 ====================== */
-/* 原生分辨率 56×66，CSS 放大 + image-rendering:pixelated  → 锐利像素风 */
+/* ====================== 像素Clawd渲染器 ====================== */
+/* 原生分辨率 56×66，CSS 放大 + image-rendering:pixelated → 锐利像素风 */
+/* Clawd 螃蟹造型 — 暖橙配色 */
 pctx.imageSmoothingEnabled=false;
 
 const PAL={
-  body:"#7ed7c2",bodyDk:"#5bbca4",bodyLt:"#a0e4d4",belly:"#d5f5ec",
-  outline:"#3aa893",outlineDk:"#2a8a76",
+  body:"#f7944a",bodyDk:"#e07b30",bodyLt:"#ffb87a",belly:"#ffe0c0",
+  outline:"#c46a2a",outlineDk:"#9b4d1a",
   eye:"#2d2722",eyeW:"#ffffff",
   blush:"#ffb3a8",blushDk:"#f09080",
   mouth:"#2d2722",tongue:"#ff7d8a",
-  sprout:"#54c9b4",sproutDk:"#3aa893",
-  footFill:"#5bbca4",footDk:"#3aa893",
+  claw:"#f08230",clawDk:"#c46a2a",clawLt:"#ffa868",
+  legFill:"#e07b30",legDk:"#c46a2a",
   angry:"#ff4d4d",angryLt:"#ff7050",
   tear:"#6fb8e8",tearHl:"#b0ddf7",
   heart:"#ff5d72",heartLt:"#ff8aa0",
@@ -1790,124 +1791,124 @@ function pEllipse(cx,cy,rx,ry,c){
   }
 }
 
-// --- 画身体（56×66 画布内的主体躯干） ---
-const BODY_ROWS=[ // [y, x0, x1] 每行左右边界（含）
-  [6, 24,31],[7,21,34],[8,19,36],[9,17,38],[10,15,40],
-  [11,13,42],[12,12,43],[13,11,44],
+// --- 螃蟹身体（56×66 画布 — 宽扁椭圆形） ---
+const BODY_ROWS=[ // [y, x0, x1]
+  [18,15,40],[19,13,42],[20,12,43],[21,11,44],
 ];
-// 生成完整 body 行（y=14~49 为全宽）
-for(let y=14;y<=49;y++) BODY_ROWS.push([y,10,45]);
-BODY_ROWS.push([50,11,44],[51,13,42],[52,15,40],[53,17,38],[54,19,36],[55,21,34],[56,23,31]);
+for(let y=22;y<=41;y++) BODY_ROWS.push([y,10,45]);
+BODY_ROWS.push([42,11,44],[43,12,43],[44,14,41],[45,16,39],[46,18,37]);
 
 function drawBody(offsY){
   const oy=Math.round(offsY||0);
-  // 身体填充
   for(const [y,x0,x1] of BODY_ROWS){
     const yy=y+oy; if(yy<0||yy>=66) continue;
-    // 主体色
     let col=PAL.body;
-    if(y<=14) col=PAL.bodyLt;                          // 顶部高光
-    else if(y>=46) col=PAL.bodyDk;                     // 底部阴影
+    if(y<=20) col=PAL.bodyLt;
+    else if(y>=44) col=PAL.bodyDk;
     pr(x0,yy,x1-x0+1,1,col);
-    // 细微渐变
-    if(y>=20&&y<=40){
+    // 肚子亮部
+    if(y>=24&&y<=38){
       const mid=Math.floor((x0+x1)/2);
-      // 肚子亮部
-      const bw=Math.floor((x1-x0)*0.45);
+      const bw=Math.floor((x1-x0)*0.42);
       pr(mid-bw+2,yy,bw*2-4,1,PAL.belly);
     }
   }
-  // 轮廓线（上下边缘加深）
   for(const [y,x0,x1] of BODY_ROWS){
     const yy=y+oy; if(yy<0||yy>=66) continue;
     ps(x0,yy,PAL.outline); ps(x1,yy,PAL.outline);
   }
-  // 身体顶部轮廓加粗
-  for(let y=6;y<=9;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
+  // 顶部轮廓加粗
+  for(let y=18;y<=20;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
   // 底部轮廓
-  for(let y=53;y<=56;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
+  for(let y=44;y<=46;y++){ const yy=y+oy; if(yy>=0&&yy<66){ const r=BODY_ROWS.find(r=>r[0]===y); if(r) ph(yy,r[0],r[1],PAL.outline); } }
 }
 
-// --- 耳朵 ---
-function drawEars(offsY){
+// --- 螃蟹钳子 ---
+function drawClaws(offsY){
   const oy=Math.round(offsY||0);
-  // 左耳 (三角)
-  const le=[
-    [4,20,22],[5,19,21],[6,18,20],[7,17,19],[8,17,19]
-  ];
-  for(const [y,x0,x1] of le){
+  // 左钳（身体左侧，y=21-30 区域）
+  // 连接臂
+  for(let y=24;y<=29;y++){ const yy=y+oy; if(yy>=0&&yy<66) for(let x=7;x<=12;x++) ps(x,yy,PAL.claw); }
+  // 上钳
+  const lu=[[19,4,11],[20,2,10],[21,1,9],[22,1,8],[23,2,8],[24,3,9],[25,4,10]];
+  for(const [y,x0,x1] of lu){
     const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=y<=5?PAL.outline:(y===8?PAL.bodyDk:PAL.bodyLt);
-      ps(x,yy,c);
-    }
+    for(let x=x0;x<=x1;x++){ const c=(x===x0||y===19||y===25)?PAL.clawDk:PAL.clawLt; ps(x,yy,c); }
   }
-  // 右耳
-  const re=[
-    [4,33,35],[5,34,36],[6,35,37],[7,36,38],[8,36,38]
-  ];
-  for(const [y,x0,x1] of re){
-    const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=y<=5?PAL.outline:(y===8?PAL.bodyDk:PAL.bodyLt);
-      ps(x,yy,c);
-    }
-  }
-}
-
-// --- 脚 ---
-function drawFeet(offsY){
-  const oy=Math.round(offsY||0);
-  // 左足
-  const lf=[[55,16,25],[56,15,26],[57,14,27],[58,15,25],[59,16,24]];
-  for(const [y,x0,x1] of lf){
-    const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=(y===55||y===59)?PAL.footDk:(x===x0||x===x1?PAL.footDk:PAL.footFill);
-      ps(x,yy,c);
-    }
-  }
-  // 右足
-  const rf=[[55,30,39],[56,30,40],[57,28,41],[58,30,40],[59,31,39]];
-  for(const [y,x0,x1] of rf){
-    const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=(y===55||y===59)?PAL.footDk:(x===x0||x===x1?PAL.footDk:PAL.footFill);
-      ps(x,yy,c);
-    }
-  }
-}
-
-// --- 嫩芽 ---
-function drawSprout(offsY){
-  const oy=Math.round(offsY||0);
-  // 茎
-  for(let y=1;y<=5;y++){ const yy=y+oy; if(yy>=0&&yy<66){ ps(27,yy,PAL.sproutDk); ps(28,yy,PAL.sproutDk); } }
-  // 左叶
-  const ll=[[0,24,27],[1,23,28],[2,22,29],[3,23,28],[4,24,27]];
+  // 下钳
+  const ll=[[26,4,10],[27,2,9],[28,1,8],[29,2,9],[30,3,10],[31,4,11]];
   for(const [y,x0,x1] of ll){
     const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=(x===x0||x===x1||y===0||y===4)?PAL.sproutDk:PAL.sprout;
-      ps(x,yy,c);
-    }
+    for(let x=x0;x<=x1;x++){ const c=(x===x0||x===x1||y===31)?PAL.clawDk:PAL.claw; ps(x,yy,c); }
   }
-  // 右叶
-  const rl=[[0,28,31],[1,27,32],[2,26,33],[3,27,32],[4,28,31]];
+  // 钳口深色分隔
+  for(let x=4;x<=8;x++){ ps(x,25+oy,PAL.clawDk); ps(x,26+oy,PAL.clawDk); }
+  // 右钳（镜像）
+  for(let y=24;y<=29;y++){ const yy=y+oy; if(yy>=0&&yy<66) for(let x=44;x<=49;x++) ps(x,yy,PAL.claw); }
+  const ru=[[19,45,52],[20,46,54],[21,47,55],[22,48,55],[23,48,54],[24,47,53],[25,46,52]];
+  for(const [y,x0,x1] of ru){
+    const yy=y+oy; if(yy<0||yy>=66) continue;
+    for(let x=x0;x<=x1;x++){ const c=(x===x1||y===19||y===25)?PAL.clawDk:PAL.clawLt; ps(x,yy,c); }
+  }
+  const rl=[[26,46,52],[27,47,54],[28,48,55],[29,47,54],[30,46,53],[31,45,52]];
   for(const [y,x0,x1] of rl){
     const yy=y+oy; if(yy<0||yy>=66) continue;
-    for(let x=x0;x<=x1;x++){
-      const c=(x===x0||x===x1||y===0||y===4)?PAL.sproutDk:PAL.sprout;
-      ps(x,yy,c);
+    for(let x=x0;x<=x1;x++){ const c=(x===x0||x===x1||y===31)?PAL.clawDk:PAL.claw; ps(x,yy,c); }
+  }
+  for(let x=48;x<=52;x++){ ps(x,25+oy,PAL.clawDk); ps(x,26+oy,PAL.clawDk); }
+}
+
+// --- 眼柄（Clawd 标志性的眼睛触角） ---
+function drawEyeStalks(offsY){
+  const oy=Math.round(offsY||0);
+  // 左眼柄
+  for(let y=15;y<=20;y++){ const yy=y+oy; if(yy>=0&&yy<66){ ps(19,yy,PAL.outline); ps(20,yy,PAL.bodyLt); } }
+  // 右眼柄
+  for(let y=15;y<=20;y++){ const yy=y+oy; if(yy>=0&&yy<66){ ps(35,yy,PAL.bodyLt); ps(36,yy,PAL.outline); } }
+  // 左眼球底座
+  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){
+    if(dx*dx+dy*dy<=6){ const yy=14+dy+oy; if(yy>=0&&yy<66) ps(19+dx,yy,PAL.outline); }
+  }
+  // 右眼球底座
+  for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){
+    if(dx*dx+dy*dy<=6){ const yy=14+dy+oy; if(yy>=0&&yy<66) ps(35+dx,yy,PAL.outline); }
+  }
+}
+
+// --- 螃蟹腿 ---
+function drawLegs(offsY){
+  const oy=Math.round(offsY||0);
+  // 左腿 3 条 (x=12,10,9 起始, y=46-51)
+  const lLegs=[
+    [[46,13,13],[47,12,13],[48,10,12],[49,9,10],[50,9,9],[51,10,10]],
+    [[46,9,9],[47,8,9],[48,6,8],[49,5,7],[50,5,6],[51,6,6]],
+    [[46,5,5],[47,6,5],[48,4,4],[49,3,4],[50,3,3],[51,4,4]],
+  ];
+  for(const leg of lLegs){
+    for(const [y,x0,x1] of leg){
+      const yy=y+oy; if(yy<0||yy>=66) continue;
+      for(let x=x0;x<=x1;x++) ps(x,yy,y===46||y===47?PAL.legDk:PAL.legFill);
+    }
+  }
+  // 右腿 3 条 (x=43,46,47 起始, y=46-51)
+  const rLegs=[
+    [[46,43,43],[47,43,44],[48,44,46],[49,46,47],[50,47,47],[51,46,46]],
+    [[46,47,47],[47,47,48],[48,48,50],[49,49,51],[50,50,51],[51,50,50]],
+    [[46,51,51],[47,51,50],[48,52,52],[49,52,53],[50,53,53],[51,52,52]],
+  ];
+  for(const leg of rLegs){
+    for(const [y,x0,x1] of leg){
+      const yy=y+oy; if(yy<0||yy>=66) continue;
+      for(let x=x0;x<=x1;x++) ps(x,yy,y===46||y===47?PAL.legDk:PAL.legFill);
     }
   }
 }
 
-// --- 眼睛（各心情不同） ---
+// --- 眼睛（各心情不同 — 螃蟹眼柄顶端） ---
 function drawEyes(mood, offsY){
   const oy=Math.round(offsY||0);
-  // 左眼中心 (~21,27) 右眼中心 (~35,27)
-  const blink = (petBlinkT>0); // 眨眼时闭眼
+  // 左眼中心 (~19,14) 右眼中心 (~35,14) — 眼柄顶端
+  const blink = (petBlinkT>0);
 
   if(mood==="happy"){
     // ^^ 弯弯笑眼
@@ -2004,14 +2005,14 @@ function drawEyes(mood, offsY){
 // --- 腮红 ---
 function drawBlush(mood, offsY){
   const oy=Math.round(offsY||0);
-  if(mood==="angry") return; // 生气没腮红
-  if(mood==="sleepy") return; // 犯困没腮红
+  if(mood==="angry") return;
+  if(mood==="sleepy") return;
   const bCol=mood==="kiss"?PAL.heart:(mood==="shy"?PAL.heart:PAL.blush);
   const size=mood==="shy"?3:2;
-  // 左
-  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(14+dx,35+dy+oy,bCol); }
-  // 右
-  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(42+dx,35+dy+oy,bCol); }
+  // 左腮红 (螃蟹身体上侧)
+  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(17+dx,33+dy+oy,bCol); }
+  // 右腮红
+  for(let dy=-size;dy<=size;dy++) for(let dx=-size;dx<=size;dx++){ if(dx*dx+dy*dy<=size*size+1) ps(37+dx,33+dy+oy,bCol); }
 }
 
 // --- 嘴 ---
@@ -2067,79 +2068,71 @@ function drawMouth(mood, offsY){
 function drawExtras(mood, offsY){
   const oy=Math.round(offsY||0);
   if(mood==="sad"){
-    // 泪滴
     const tearFrame=Math.floor(petFrame/4)%2;
     if(tearFrame===0){
-      ps(16,39+oy,PAL.tear); ps(16,40+oy,PAL.tear);
-      ps(15,40+oy,PAL.tearHl); ps(17,40+oy,PAL.tear);
-      ps(16,41+oy,PAL.tearHl); ps(17,41+oy,PAL.tear);
-      // 右泪
-      ps(40,38+oy,PAL.tear); ps(40,39+oy,PAL.tear);
-      ps(39,39+oy,PAL.tearHl); ps(41,39+oy,PAL.tear);
+      ps(18,37+oy,PAL.tear); ps(18,38+oy,PAL.tear);
+      ps(17,38+oy,PAL.tearHl); ps(19,38+oy,PAL.tear);
+      ps(18,39+oy,PAL.tearHl); ps(19,39+oy,PAL.tear);
+      ps(38,36+oy,PAL.tear); ps(38,37+oy,PAL.tear);
+      ps(37,37+oy,PAL.tearHl); ps(39,37+oy,PAL.tear);
     }
   }
   if(mood==="angry"){
-    // 怒气符号（右上方）
-    const ax=42, ay=14+oy;
+    // 怒气符号（眼柄上方）
+    const ax=38, ay=6+oy;
     ps(ax,ay,PAL.angryLt); ps(ax+4,ay,PAL.angryLt);
     ps(ax+1,ay+1,PAL.angryLt); ps(ax+3,ay+1,PAL.angryLt);
     ps(ax+2,ay+2,PAL.angry); ps(ax+2,ay-1,PAL.angry);
     ps(ax-1,ay+1,PAL.angry); ps(ax+5,ay+1,PAL.angry);
-    // 身体红色罩（肚子上几行淡红）
-    for(let y=25;y<=38;y++){
+    for(let y=27;y<=40;y++){
       const r=BODY_ROWS.find(r=>r[0]===y); if(!r) continue;
       const x0=r[1]+3, x1=r[2]-3;
       for(let x=x0;x<=x1;x+=2) ps(x,y+oy,"rgba(255,90,70,0.45)");
     }
   }
   if(mood==="kiss"){
-    // 飘小心心（动画位置）
-    const hx=22+Math.round(Math.sin(petFrame*0.25)*3);
-    const hy=12+oy-Math.round((petFrame%12)*0.7);
+    const hx=23+Math.round(Math.sin(petFrame*0.25)*3);
+    const hy=10+oy-Math.round((petFrame%12)*0.7);
     ps(hx,hy,PAL.heart); ps(hx+2,hy,PAL.heart);
     ps(hx+1,hy+1,PAL.heartLt);
     ps(hx,hy+1,PAL.heart); ps(hx+2,hy+1,PAL.heart);
     ps(hx+1,hy+2,PAL.heart);
   }
   if(mood==="happy"){
-    // 小音符/闪光
-    const sx=40+Math.round(Math.sin(petFrame*0.3)*2);
-    const sy=16+oy;
+    const sx=38+Math.round(Math.sin(petFrame*0.3)*2);
+    const sy=20+oy;
     ps(sx,sy,"#ffc24a"); ps(sx,sy-1,"#fff");
   }
   if(mood==="sleepy"){
-    // Zzz 冒泡
     const zf=Math.floor(petFrame/10)%3;
     if(zf===0){
-      const zx=38, zy=8+oy;
+      const zx=38, zy=4+oy;
       ps(zx,zy,"#6fb8e8"); ps(zx+1,zy,"#6fb8e8"); ps(zx+2,zy-1,"#6fb8e8");
       ps(zx+3,zy,"#6fb8e8"); ps(zx+3,zy-2,"#6fb8e8"); ps(zx+4,zy-1,"#b0ddf7");
     }else if(zf===1){
-      const zx=40, zy=4+oy;
+      const zx=40, zy=0+oy;
       ps(zx,zy,"#b0ddf7"); ps(zx+1,zy,"#b0ddf7"); ps(zx+2,zy-1,"#b0ddf7");
       ps(zx+2,zy-3,"#b0ddf7"); ps(zx+3,zy-2,"#6fb8e8");
     }
-    // 身体颜色变暗
-    for(let y=20;y<=45;y+=4){
+    for(let y=22;y<=44;y+=4){
       const r=BODY_ROWS.find(r=>r[0]===y); if(!r) continue;
       for(let x=r[1]+2;x<=r[2]-2;x+=3) ps(x,y+oy,"rgba(120,120,150,0.2)");
     }
   }
   if(mood==="shy"){
-    // 额头竖线（害羞线）
-    for(let y=18;y<=22;y++){ ps(22,18+oy,"#ffb3a8"); ps(23,17+oy,"#ffb3a8"); ps(24,18+oy,"#ffb3a8"); }
-    ps(22,19+oy,PAL.blushDk); ps(23,18+oy,PAL.blushDk); ps(24,19+oy,PAL.blushDk);
-    // 冒小蒸汽
+    // 害羞线 (两眼柄之间)
+    for(let y=14;y<=17;y++){ ps(25,14+oy,"#ffb3a8"); ps(26,13+oy,"#ffb3a8"); ps(27,14+oy,"#ffb3a8"); }
+    ps(25,15+oy,PAL.blushDk); ps(26,14+oy,PAL.blushDk); ps(27,15+oy,PAL.blushDk);
     const stx=37+Math.round(Math.sin(petFrame*0.4)*2);
-    ps(stx,14+oy,"#ffe0e0"); ps(stx+1,13+oy,"#ffe0e0");
-    ps(stx+3,15+oy,"#ffd0d0");
+    ps(stx,12+oy,"#ffe0e0"); ps(stx+1,11+oy,"#ffe0e0");
+    ps(stx+3,13+oy,"#ffd0d0");
   }
 }
 
 // --- 主绘制 ---
 function drawPixelPet(mood, frame){
   pctx.clearRect(0,0,56,66);
-  // 邦布模式
+  // 精灵模式
   if(skinMode==="bangboo"){
     const img=BANGBOO_IMGS[mood]||BANGBOO_IMGS.neutral;
     if(img&&bangbooReady){
@@ -2152,29 +2145,30 @@ function drawPixelPet(mood, frame){
     }
     return;
   }
-  // 像素小克模式
+  // 像素Clawd模式 — Clawd 螃蟹
   const offsY = mood==="sad"?1: (mood==="sleepy"?2:0);
+  const eyeOffsY = offsY - 13; // 眼睛在眼柄顶端
   // 拥抱暖光
   if(petExtra==="hug"){
     for(let i=0;i<6;i++){
       const gx=24+Math.floor(Math.cos(frame*0.4+i*1.05)*20);
-      const gy=30+Math.floor(Math.sin(frame*0.4+i*1.05)*16);
+      const gy=28+Math.floor(Math.sin(frame*0.4+i*1.05)*14);
       ps(gx,gy+offsY,"#ffe0c0"); ps(gx+1,gy+offsY,"#fff0e0");
       ps(gx-1,gy+offsY,"#ffd0a0");
     }
   }
-  drawEars(offsY);
-  drawSprout(offsY);
+  drawEyeStalks(offsY);
   drawBody(offsY);
-  drawFeet(offsY);
+  drawClaws(offsY);
+  drawLegs(offsY);
   drawExtras(mood,offsY);
-  drawEyes(mood,offsY);
+  drawEyes(mood,eyeOffsY);
   // 摸头深层脸红
   if(petExtra==="pat"){
-    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(14+dx,35+dy+offsY,"#ff9080"); }
-    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(42+dx,35+dy+offsY,"#ff9080"); }
+    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(18+dx,35+dy+offsY,"#ff9080"); }
+    for(let dy=-3;dy<=3;dy++) for(let dx=-2;dx<=2;dx++){ if(dx*dx+dy*dy<=9) ps(36+dx,35+dy+offsY,"#ff9080"); }
     // 额头小闪光
-    const sx=28+Math.round(Math.sin(frame*0.5)*3), sy=8+offsY;
+    const sx=28+Math.round(Math.sin(frame*0.5)*3), sy=16+offsY;
     ps(sx,sy,"#fff"); ps(sx+2,sy+1,"#ffc24a");
   }
   drawBlush(mood,offsY);
@@ -2209,8 +2203,8 @@ function petRenderLoop(){
   petRenderTid=requestAnimationFrame(petRenderLoop);
 }
 
-/* ====================== 邦布精灵 (base64) ====================== */
-/* ---- 邦布精灵预加载 (带加载状态追踪) ---- */
+/* ====================== 精灵精灵 (base64) ====================== */
+/* ---- 精灵精灵预加载 (带加载状态追踪) ---- */
 const BANGBOO_IMGS={};
 let bangbooReady=false;
 (function preloadBangboo(){
@@ -3042,7 +3036,7 @@ const TIP_POOL = [
   {icon:"👁",cond:()=>running&&!lastFaceLandmarks, text:"把脸对准摄像头哦～"},
   {icon:"🎮",cond:()=>running, text:"左下角 ? 按钮查看全部手势速查～"},
   {icon:"💡",cond:()=>running&&templates.length>0, text:"凑近我、远离我、打个哈欠试试？"},
-  {icon:"🔄",cond:()=>true, text:"顶部「邦布模式」按钮可切换精灵/像素皮肤～"},
+  {icon:"🔄",cond:()=>true, text:"顶部「精灵模式」按钮可切换精灵/像素皮肤～"},
 ];
 function startTipRotation(){
   if(tipInterval) clearInterval(tipInterval);
@@ -3083,7 +3077,7 @@ function updateHelpSection(){
     <ol>
       <li><b>开启摄像头</b>，等模型加载完（顶部圆点变绿）。</li>
       <li>对镜头做一个表情，点对应<b>预设</b>或填名字后<b>录制</b>，保持约 0.5s。</li>
-      <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），小克就会实时跟着切换。</li>
+      <li>多录几个（中性 / 开心 / 惊讶 / 生气 / 难过…），Clawd就会实时跟着切换。</li>
       <li>点某条基准可<b>编辑</b>它的心情 / 台词 / emoji / 粒子 / GIF。</li>
       <li>关键点有偏移就进<b>校准模式</b>拖一拖。</li>
     </ol>
@@ -3094,16 +3088,16 @@ function updateHelpSection(){
       <li>🤗 <b>拥抱</b>：双手靠近胸前</li>
       <li>👋 <b>挥手</b>：手在脸前左右摆动 3 次</li>
       <li>👍 <b>点赞</b> / ✌️ <b>比耶</b> / 🫶 <b>手指比心</b> / ☝️ <b>指点点</b></li>
-      <li>🙌 <b>举手</b>：小克会跟着举手！</li>
+      <li>🙌 <b>举手</b>：Clawd会跟着举手！</li>
     </ol>
     <b style="display:block;margin-top:12px">👀 脸部小互动</b>
     <ol style="margin-top:4px">
-      <li><b>注视</b>屏幕小克会回看，看别处它会歪头</li>
+      <li><b>注视</b>屏幕Clawd会回看，看别处它会歪头</li>
       <li>快速<b>双眨眼</b>可触发截屏闪光 📸</li>
-      <li>连续<b>点头</b>/<b>摇头</b>小克有反应</li>
-      <li><b>打哈欠</b>小克跟着犯困 💤</li>
-      <li><b>凑近</b>摄像头小克害羞，<b>远离</b>它会招手</li>
-      <li>离开摄像头 4 秒再回来，小克会惊喜！</li>
+      <li>连续<b>点头</b>/<b>摇头</b>Clawd有反应</li>
+      <li><b>打哈欠</b>Clawd跟着犯困 💤</li>
+      <li><b>凑近</b>摄像头Clawd害羞，<b>远离</b>它会招手</li>
+      <li>离开摄像头 4 秒再回来，Clawd会惊喜！</li>
     </ol>
     <b style="display:block;margin-top:12px">🎓 引导与发现</b>
     <div style="margin-top:6px">
@@ -3135,7 +3129,7 @@ triggerHeadMotion=function(result){
 const _origTriggerDist=triggerDistanceReaction;
 triggerDistanceReaction=function(stage){
   _origTriggerDist(stage);
-  if(stage==="near") setTipOverride("😳","太近啦！小克害羞",2000);
+  if(stage==="near") setTipOverride("😳","太近啦！Clawd害羞",2000);
   else if(stage==="far") setTipOverride("👋","别走太远～",2000);
 };
 const _origTriggerPose=triggerPoseReaction;
@@ -3265,13 +3259,13 @@ const Spotlight = {
 /* ====================== 交互式教程引擎 ====================== */
 const TUTORIAL_KEY="kc-tutorial-done";
 const TUTORIAL_STEPS = [
-  {id:"welcome",emoji:"👋",title:"欢迎来到互动教程！",text:"让我带你快速上手小克表情桌宠～<br>跟着提示一步步操作即可",highlight:null,validator:null,autoAdvance:3000},
+  {id:"welcome",emoji:"👋",title:"欢迎来到互动教程！",text:"让我带你快速上手Clawd表情桌宠～<br>跟着提示一步步操作即可",highlight:null,validator:null,autoAdvance:3000},
   {id:"camera",emoji:"📷",title:"第一步：开启摄像头",text:"点击下方高亮的「开启摄像头」按钮<br>然后允许浏览器使用摄像头权限",highlight:"#startBtn",validator:()=>running,waitText:"等待摄像头开启…"},
   {id:"record_neutral",emoji:"😐",title:"第二步：录制中性表情",text:"面无表情地看着镜头<br>然后点击右侧高亮的「😐 中性」预设按钮",highlight:".preset:first-child",validator:()=>templates.length>0,waitText:"等待录制中性表情…"},
   {id:"record_happy",emoji:"😄",title:"第三步：录制开心表情",text:"对着镜头笑一个！<br>然后点击「😄 开心」预设按钮",highlight:".preset:nth-child(2)",validator:()=>templates.length>1,waitText:"等待录制开心表情…"},
-  {id:"try_blink",emoji:"😉",title:"第四步：试试眨眼",text:"对着镜头眨一下眼睛<br>小克会注意到你的眨眼哦！",highlight:"#stage",validator:()=>discovered.has("blink_single")||discovered.has("blink_double"),waitText:"等待眨眼…"},
+  {id:"try_blink",emoji:"😉",title:"第四步：试试眨眼",text:"对着镜头眨一下眼睛<br>Clawd会注意到你的眨眼哦！",highlight:"#stage",validator:()=>discovered.has("blink_single")||discovered.has("blink_double"),waitText:"等待眨眼…"},
   {id:"try_gesture",emoji:"✌️",title:"第五步：手势互动",text:"试试对着镜头比个 ✌️（食指+中指伸出）<br>或者 👍 点赞手势",highlight:"#stage",validator:()=>discovered.has("gesture_peaceSign")||discovered.has("gesture_thumbsUp")||discovered.has("gesture_fingerHeart"),waitText:"等待手势…"},
-  {id:"finish",emoji:"🎉",title:"准备就绪！",text:"你已解锁了小克的核心互动玩法！<br>左下角 <b>?</b> 按钮随时查看手势速查<br><b>🏆</b> 按钮查看你的发现进度<br>顶部还能切换 🎨 邦布模式哦～",highlight:"#helpBtn",validator:null,autoAdvance:7000},
+  {id:"finish",emoji:"🎉",title:"准备就绪！",text:"你已解锁了Clawd的核心互动玩法！<br>左下角 <b>?</b> 按钮随时查看手势速查<br><b>🏆</b> 按钮查看你的发现进度<br>顶部还能切换 🎨 精灵模式哦～",highlight:"#helpBtn",validator:null,autoAdvance:7000},
 ];
 let tutorialActive=false, tutorialStep=0, tutorialPaused=false, tutorialTimer=null;
 
@@ -3365,11 +3359,11 @@ const HINT_POOL=[
   {key:"dist_near",text:"凑近摄像头看看我会有什么反应？",icon:"🔍"},
   {key:"gesture_hug",text:"双手靠近胸前试试拥抱我？",icon:"🤗"},
   {key:"gesture_kiss",text:"手靠近嘴边再向外推，试试飞吻？",icon:"💋"},
-  {key:"yawn",text:"打个哈欠试试看？小克会跟着犯困",icon:"🥱"},
+  {key:"yawn",text:"打个哈欠试试看？Clawd会跟着犯困",icon:"🥱"},
   {key:"gesture_wave",text:"手在脸前左右摆动可以跟我挥手",icon:"👋"},
   {key:"head_nod",text:"对着镜头点点头试试？",icon:"🙂"},
-  {key:"pose_armsUp",text:"举起双手，小克会跟着模仿！",icon:"🙌"},
-  {key:"feat_skin",text:"点顶部「邦布模式」按钮可以切换皮肤哦",icon:"🎨"},
+  {key:"pose_armsUp",text:"举起双手，Clawd会跟着模仿！",icon:"🙌"},
+  {key:"feat_skin",text:"点顶部「精灵模式」按钮可以切换皮肤哦",icon:"🎨"},
   {key:"feat_calibrate",text:"识别不准？试试用校准模式微调",icon:"🎯"},
 ];
 let hintSessionStart=0, hintCountThisSession=0, lastHintTime=0, hintCheckTimer=null;
@@ -3416,13 +3410,13 @@ function initSkinToggle(){
     skinMode=skinMode==="bangboo"?"pixel":"bangboo";
     localStorage.setItem(SKIN_KEY,skinMode);
     updateSkinButton();
-    toast(skinMode==="bangboo"?"已切换为 🎨 邦布精灵":"已切换为 👾 像素小克",1500);
+    toast(skinMode==="bangboo"?"已切换为 🎨 精灵精灵":"已切换为 👾 像素Clawd",1500);
     discover("feat_skin");
     SoundFX.click();
   });
 }
 function updateSkinButton(){
-  $("skinToggle").textContent=skinMode==="bangboo"?"🎨 邦布模式":"👾 小克模式";
+  $("skinToggle").textContent=skinMode==="bangboo"?"🎨 精灵模式":"👾 Clawd模式";
   $("skinToggle").style.background=skinMode==="bangboo"?"var(--sun-soft)":"var(--mint-soft)";
   $("skinToggle").style.borderColor=skinMode==="bangboo"?"var(--sun)":"var(--mint)";
 }
