@@ -515,6 +515,67 @@ details.help[open] summary .tri{transform:rotate(90deg)}
 .cheat-sheet .ch-item:hover{background:var(--mint-soft); color:var(--ink)}
 .cheat-sheet .ch-item .chi{font-size:16px; flex:none; width:22px; text-align:center}
 .cheat-sheet .ch-close{display:block; margin:10px auto 0; font-size:11px; font-weight:800; color:var(--ink-faint); background:none; border:none; cursor:pointer}
+
+/* ===== 聚光灯遮罩 (Spotlight Overlay) ===== */
+.spotlight-overlay{position:fixed;inset:0;z-index:250;pointer-events:none;background:rgba(45,39,34,.62);transition:clip-path .35s cubic-bezier(.2,.8,.3,1);}
+
+/* ===== 交互式教程卡片 ===== */
+.tutorial-overlay{position:fixed;inset:0;z-index:290;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:60px;}
+.tutorial-card{background:var(--card);border:2.5px solid var(--mint);border-radius:20px;padding:22px 26px 18px;max-width:400px;width:calc(100% - 40px);box-shadow:0 20px 50px -16px rgba(0,0,0,.45),0 0 0 8px rgba(31,185,163,.1);pointer-events:auto;text-align:center;position:relative;animation:tutSlideUp .4s cubic-bezier(.2,.9,.3,1);}
+@keyframes tutSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.tutorial-card .tut-emoji{font-size:48px;line-height:1;margin-bottom:6px}
+.tutorial-card h3{font-family:"Fredoka",sans-serif;font-size:18px;margin:0 0 6px;color:var(--ink)}
+.tutorial-card p{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 6px}
+.tutorial-card .tut-wait{font-size:12px;font-weight:700;color:var(--mint-d);display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:13px}
+.tutorial-card .tut-wait .spinner{width:16px;height:16px;border:2.5px solid var(--mint-soft);border-top-color:var(--mint);border-radius:50%;animation:tutSpin .8s linear infinite}
+@keyframes tutSpin{to{transform:rotate(360deg)}}
+.tutorial-card .tut-dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.tutorial-card .tut-dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:all .25s}
+.tutorial-card .tut-dot.cur{background:var(--mint);transform:scale(1.4);box-shadow:0 0 6px rgba(31,185,163,.5)}
+.tutorial-card .tut-dot.done{background:var(--mint);opacity:.5}
+.tutorial-card .tut-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tutorial-card .tut-actions button{font-family:inherit;font-weight:800;font-size:12.5px;padding:9px 15px;border-radius:11px;cursor:pointer;transition:all .12s;border:1.5px solid var(--line)}
+.tutorial-card .tut-skip{background:transparent;color:var(--ink-soft);border-style:dashed}
+.tutorial-card .tut-skip:hover{background:var(--card-2)}
+.tutorial-card .tut-next{background:var(--mint);color:#fff;border-color:var(--mint-d)}
+.tutorial-card .tut-next:hover{background:#3ccdb7}
+.tutorial-card .tut-prev{background:var(--card-2);color:var(--ink)}
+
+/* ===== 发现庆祝 Toast ===== */
+.discovery-toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-120px);z-index:400;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#1fb9a3,#36ccb4);color:#fff;font-weight:800;font-size:14px;padding:12px 20px;border-radius:999px;box-shadow:0 14px 35px -8px rgba(31,185,163,.55);pointer-events:none;opacity:0;transition:transform .45s cubic-bezier(.2,1.2,.4,1),opacity .3s;white-space:nowrap;}
+.discovery-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== 发现清单面板 ===== */
+.discovery-panel-overlay{position:fixed;inset:0;z-index:280;background:rgba(45,39,34,.3);display:none;align-items:stretch;justify-content:flex-end;}
+.discovery-panel-overlay.show{display:flex}
+.discovery-panel{position:relative;width:340px;max-width:88vw;background:var(--card);border-left:2px solid var(--line);box-shadow:-12px 0 40px -16px rgba(0,0,0,.4);padding:22px 18px 18px;overflow-y:auto;max-height:100%;animation:panelSlideIn .35s cubic-bezier(.2,.9,.3,1);}
+@keyframes panelSlideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+.discovery-panel h3{font-family:"Fredoka",sans-serif;font-size:17px;margin:0 0 4px;display:flex;align-items:center;gap:8px;position:relative}
+.discovery-panel .dp-close{position:absolute;right:0;top:-4px;width:32px;height:32px;border-radius:50%;background:var(--card-2);border:1.5px solid var(--line);font-size:16px;cursor:pointer;display:grid;place-items:center;color:var(--ink-soft);transition:all .12s;}
+.discovery-panel .dp-close:hover{background:var(--coral-soft);border-color:var(--coral);color:var(--coral-d)}
+.discovery-panel .dp-progress{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;color:var(--mint-d)}
+.discovery-panel .dp-bar{height:6px;border-radius:999px;background:var(--line-2);margin:10px 0 16px;overflow:hidden}
+.discovery-panel .dp-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--mint),#41d3bd);transition:width .4s cubic-bezier(.2,.9,.3,1)}
+.discovery-panel .dp-cat{margin-bottom:14px}
+.discovery-panel .dp-cat-name{font-size:11.5px;font-weight:800;color:var(--ink-faint);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.discovery-panel .dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.discovery-panel .dp-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:9px;font-size:12px;font-weight:700;background:var(--card-2);border:1.5px solid var(--line-2);transition:all .15s;}
+.discovery-panel .dp-item.found{background:var(--mint-soft);border-color:var(--mint);color:var(--mint-d)}
+.discovery-panel .dp-item .dpi{font-size:16px;flex:none;width:22px;text-align:center;filter:grayscale(1);opacity:.2}
+.discovery-panel .dp-item.found .dpi{filter:none;opacity:1}
+
+/* ===== 功能提示气泡 ===== */
+.hint-bubble-wrap{position:absolute;right:80px;top:16px;z-index:15;pointer-events:none;opacity:0;transform:translateY(-8px);transition:opacity .35s,transform .35s;}
+.hint-bubble-wrap.show{opacity:1;transform:translateY(0)}
+.hint-bubble{position:relative;background:#fff;border:2px solid var(--sun);border-radius:14px;padding:9px 13px;font-size:12px;font-weight:700;color:var(--ink);box-shadow:0 8px 20px -8px rgba(0,0,0,.2);white-space:nowrap;display:flex;align-items:center;gap:7px;}
+
+/* ===== 引导按钮组 ===== */
+.guide-btns{position:absolute;left:14px;top:54px;z-index:8;display:flex;flex-direction:column;gap:6px;}
+.guide-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink-soft);font-weight:800;font-size:16px;display:grid;place-items:center;cursor:pointer;user-select:none;box-shadow:0 3px 8px -4px rgba(var(--shadow),.4);transition:all .15s;line-height:1;}
+.guide-btn:hover{transform:scale(1.1);border-color:var(--mint);color:var(--mint-d)}
+.guide-btn.has-badge{position:relative}
+.guide-btn.has-badge::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--coral);border:2px solid #fff;animation:gbPulse 1.5s ease-in-out infinite}
+@keyframes gbPulse{0%,100%{box-shadow:0 3px 8px -4px rgba(var(--shadow),.4)}50%{box-shadow:0 3px 8px -4px rgba(var(--shadow),.4),0 0 0 6px rgba(31,185,163,.2)}}
 </style>
 </head>
 <body>
@@ -548,8 +609,12 @@ details.help[open] summary .tri{transform:rotate(90deg)}
           <div class="val" id="curExpr">—</div>
           <div class="sub" id="curSub">等待基准</div>
         </div>
-        <!-- 手势速查按钮 & 面板 -->
+        <!-- 手势速查按钮 & 引导按钮组 -->
         <div class="help-btn" id="helpBtn" title="手势速查">?</div>
+        <div class="guide-btns">
+          <button class="guide-btn" id="tutorialBtn" title="互动教程">🎓</button>
+          <button class="guide-btn" id="discoveryBtn" title="发现清单">🏆</button>
+        </div>
         <div class="cheat-sheet" id="cheatSheet">
           <h4>🎮 手势 & 互动速查</h4>
           <div class="ch-grid">
@@ -587,6 +652,7 @@ details.help[open] summary .tri{transform:rotate(90deg)}
         <div id="emojiLayer"></div>
         <div id="bubble"><div class="bubble-inner" id="bubbleText">嗨～</div></div>
         <canvas id="fx"></canvas>
+        <div class="hint-bubble-wrap" id="hintBubbleWrap"><div class="hint-bubble" id="hintBubble"></div></div>
         <div class="stage-tip"><span id="tipIcon">👀</span><span id="tipText">允许摄像头后，对我做表情吧</span></div>
       </div>
     </div>
@@ -1123,6 +1189,7 @@ function triggerGazeReaction(dir, looking, now){
 }
 
 function triggerBlinkReaction(type){
+  discover("blink_"+type);
   if(type==="single"){
     if(Math.random()<0.5) say(["眨眼啦！","嘿！","看到你眨眼了哦～","😉"][Math.floor(Math.random()*4)]);
     spawnEmojis("✨");
@@ -1145,6 +1212,7 @@ function triggerBlinkReaction(type){
 }
 
 function triggerHeadMotion(result){
+  discover("head_"+result.type);
   if(result.type==="nod"&&performance.now()-lastHeadMotionTrig>2000){
     lastHeadMotionTrig=performance.now();
     say("嗯嗯！对呀对呀～");
@@ -1174,6 +1242,7 @@ function triggerYawn(){
 }
 
 function triggerDistanceReaction(stage){
+  discover("dist_"+stage);
   if(stage==="near"){
     say("哇！太近啦～");
     petEl.classList.add("shy-mode");
@@ -1188,6 +1257,7 @@ function triggerDistanceReaction(stage){
 }
 
 function triggerPoseReaction(poseType){
+  discover("pose_"+poseType);
   if(poseType==="armsUp"){
     petEl.classList.add("pose-armsup");
     setTimeout(()=>petEl.classList.remove("pose-armsup"),1400);
@@ -1201,6 +1271,9 @@ function triggerPoseReaction(poseType){
 
 function triggerHandGestureReaction(gesture){
   lastInteractionTime=performance.now();
+  // 归一化 point 手势
+  const discKey=gesture.startsWith("point")?"point":gesture;
+  discover("gesture_"+discKey);
   if(gesture==="thumbsUp"){
     say("被点赞了！开心～");
     spawnEmojis("👍⭐💛");
@@ -1494,10 +1567,12 @@ function processGesture(gestures, now){
     if(mapped==="thumbsUp"||mapped==="peaceSign"||mapped==="fingerHeart"){
       triggerHandGestureReaction(mapped);
     }else if(mapped==="thumbsDown"){
+      discover("gesture_thumbsDown");
       say("诶？不喜欢吗…");
       spawnEmojis("😢");
       SoundFX.sad();
     }else if(mapped==="fist"){
+      discover("gesture_fist");
       say("加油！💪");
       spawnEmojis("💪🔥");
       SoundFX.happy();
@@ -1535,6 +1610,7 @@ function processFace(res){
   // 离场→回来检测
   const presResult=PresenceDetector.faceSeen(now);
   if(presResult==="return"){
+    discover("presence_return");
     say("你回来啦！我好想你～");
     spawnEmojis("😍💕✨");
     SoundFX.happy();
@@ -1674,6 +1750,7 @@ function commitExpr(tpl){
   currentLabel=tpl.id; currentTpl=tpl;
   applyReaction(tpl,true);
   highlightActive(tpl.id);
+  discover("expr_"+tpl.mood);
 }
 
 /* ====================== 像素小克渲染器 ====================== */
@@ -2328,6 +2405,7 @@ function processHand(res){
 
 /* ---- 摸头触发 ---- */
 function triggerPat(handP){
+  discover("gesture_pat");
   lastInteractionTime=performance.now();
   patCount++; if(performance.now()-lastPatTime>3000) patCount=1;
   lastPatTime=performance.now();
@@ -2347,6 +2425,7 @@ function triggerPat(handP){
 
 /* ---- 拥抱触发 ---- */
 function triggerHug(midP){
+  discover("gesture_hug");
   lastInteractionTime=performance.now();
   hugCount++; petExtra="hug";
   setTimeout(()=>{ if(petExtra==="hug") petExtra=null; }, 2200);
@@ -2362,6 +2441,7 @@ function triggerHug(midP){
 
 /* ---- 挥手触发 ---- */
 function triggerWave(){
+  discover("gesture_wave");
   lastInteractionTime=performance.now();
   petEl.classList.add("waving");
   setTimeout(()=>petEl.classList.remove("waving"), 900);
@@ -2375,6 +2455,7 @@ function triggerWave(){
 
 /* ---- 飞吻触发（增强） ---- */
 function triggerKiss(handP, mouthP){
+  discover("gesture_kiss");
   lastInteractionTime=performance.now();
   kissUntil=performance.now()+2200;
   applyMood("kiss"); applyGif(null);
@@ -2615,6 +2696,7 @@ function quickRecord(preset, btnEl){
       renderTpls();
       saveAll();
       toast(`已录制「${preset.name}」（${samples.length} 帧）`);
+      discover("feat_record");
       recordingTimer=null; recordingCount=0;
       // 若这是第一个基准，直接激活
       if(templates.length===1){ currentLabel=tpl.id; currentTpl=tpl; highlightActive(tpl.id); }
@@ -2660,6 +2742,7 @@ function customRecord(){
       recBtn.textContent="● 录制"; recBtn.style.background=""; recBtn.style.color="";
       refreshButtons();
       toast(`已录制「${name}」（${samples.length} 帧）`);
+      discover("feat_record");
       nameInp.value="";
       if(templates.length===1){ currentLabel=tpl.id; currentTpl=tpl; highlightActive(tpl.id); }
       return;
@@ -2768,6 +2851,7 @@ function enterCalib(){
   updateCalibInfo();
   refreshButtons();
   toast("校准模式：拖动红点修正偏移");
+  discover("feat_calibrate");
 }
 function exitCalib(){
   calibrating=false; calibFrozen=null; dragIdx=-1;
@@ -2808,6 +2892,7 @@ function exportData(){
   a.download="kc-deskpet-"+new Date().toISOString().slice(0,10)+".json"; a.click();
   URL.revokeObjectURL(a.href);
   toast("已导出 "+templates.length+" 条基准");
+  discover("feat_export");
 }
 function importData(file){
   const reader=new FileReader();
@@ -2897,6 +2982,7 @@ $("edGif").addEventListener("change", e=>{
   saveAll();
   if(currentLabel===t.id){ currentTpl=t; applyGif(url); }
   toast("GIF 已应用");
+  discover("feat_gif");
 });
 $("edGifClear").addEventListener("click", ()=>{
   if(!selectedId) return;
@@ -2919,52 +3005,17 @@ $("showLm").addEventListener("change", ()=>{
 });
 
 /* ====================== 引导轮播 ====================== */
-const ONBOARD_STEPS = [
-  {emoji:"👋", title:"欢迎来到小克表情桌宠！", text:"小克是一只像素风桌面宠物，能实时识别你的<b>表情</b>、<b>手势</b>和<b>身体姿势</b>，并做出可爱的反应！"},
-  {emoji:"🙂", title:"录几个表情试试", text:"对镜头做不同表情（中性/开心/惊讶/生气/难过），点右侧<b>预设按钮</b>或填名字后点<b>录制</b>。小克就会自动跟着你的表情变啦～"},
-  {emoji:"👀", title:"脸部互动", text:"<b>盯着屏幕</b>小克会回看你；快速<b>眨眼</b>可以截屏闪光；<b>点头/摇头</b>它会回应；<b>打哈欠</b>它也跟着犯困；<b>凑近/远离</b>摄像头看看什么反应？"},
-  {emoji:"✋", title:"手势互动", text:"试试这些手势：<b>👍点赞</b>、<b>✌️比耶</b>、<b>🫶手指比心</b>、<b>☝️指点点</b>；还有<b>飞吻</b>（手靠近嘴再推开）、<b>摸头</b>、<b>挥手</b>、<b>双手拥抱</b>。"},
-  {emoji:"🤸", title:"准备好了吗？", text:"点击<b>「开启摄像头」</b>开始，允许摄像头权限。舞台左下角的 <b>?</b> 按钮随时可以查看手势速查表。玩得开心！🎉"},
-];
-let onboardStep=0;
-const ONBOARD_KEY="kc-onboard-v2";
-
 function showOnboard(){
-  if(localStorage.getItem(ONBOARD_KEY)) return;
-  const ov=$("onboardOverlay"), card=$("onboardCard");
-  ov.style.display="grid";
-  function render(){
-    const s=ONBOARD_STEPS[onboardStep];
-    card.innerHTML=`
-      <div class="ob-emoji">${s.emoji}</div>
-      <h3>${s.title}</h3>
-      <p>${s.text}</p>
-      <div class="ob-dots">${ONBOARD_STEPS.map((_,i)=>`<div class="ob-dot${i===onboardStep?' cur':''}"></div>`).join("")}</div>
-      <div class="ob-actions">
-        <button class="ob-skip" id="obSkip">跳过</button>
-        ${onboardStep>0?'<button class="ob-prev" id="obPrev">上一步</button>':''}
-        ${onboardStep<ONBOARD_STEPS.length-1?'<button class="ob-next" id="obNext">下一步</button>':'<button class="ob-next" id="obDone">开始体验 🚀</button>'}
-      </div>`;
-    bindBtns();
-  }
-  function bindBtns(){
-    const skip=card.querySelector("#obSkip"), prev=card.querySelector("#obPrev"),
-          next=card.querySelector("#obNext"), done=card.querySelector("#obDone");
-    skip&&skip.addEventListener("click",closeOnboard);
-    prev&&prev.addEventListener("click",()=>{onboardStep--;render();SoundFX.click();});
-    next&&next.addEventListener("click",()=>{onboardStep++;render();SoundFX.click();});
-    done&&done.addEventListener("click",()=>{closeOnboard();if(!running&&modelsReady)startCamera();});
-  }
-  function closeOnboard(){
-    ov.style.display="none"; localStorage.setItem(ONBOARD_KEY,"1");
-  }
-  render();
+  // 如果已完成过教程，不再自动弹出
+  if(localStorage.getItem(TUTORIAL_KEY)) return;
+  // 直接启动交互式教程
+  setTimeout(()=>startTutorial(0), 600);
 }
 
 /* ====================== 手势速查面板 ====================== */
 function initCheatSheet(){
   const btn=$("helpBtn"), sheet=$("cheatSheet"), close=$("chClose");
-  btn.addEventListener("click",()=>{sheet.classList.toggle("show");SoundFX.click();});
+  btn.addEventListener("click",()=>{sheet.classList.toggle("show");Spotlight.clear();hideHintBubble();SoundFX.click();});
   close.addEventListener("click",()=>{sheet.classList.remove("show")});
   // 点击舞台其他位置关闭
   stage.addEventListener("click",e=>{
@@ -2973,6 +3024,13 @@ function initCheatSheet(){
       sheet.classList.remove("show");
     }
   });
+  // 引导按钮组事件绑定
+  $("tutorialBtn").addEventListener("click",()=>{
+    if(tutorialActive){ stopTutorial(true); return; }
+    Spotlight.clear(); hideHintBubble();
+    startTutorial(0);
+  });
+  $("discoveryBtn").addEventListener("click",toggleDiscoveryPanel);
 }
 
 /* ====================== 上下文场景提示 ====================== */
@@ -3047,6 +3105,11 @@ function updateHelpSection(){
       <li><b>凑近</b>摄像头小克害羞，<b>远离</b>它会招手</li>
       <li>离开摄像头 4 秒再回来，小克会惊喜！</li>
     </ol>
+    <b style="display:block;margin-top:12px">🎓 引导与发现</b>
+    <div style="margin-top:6px">
+      <button class="btn sm ghost" id="helpReplayTutorial" style="font-size:11px">🎓 重新开始互动教程</button>
+      <button class="btn sm ghost" id="helpDiscoveryPanel" style="font-size:11px;margin-left:6px">🏆 查看发现清单</button>
+    </div>
   `;
 }
 
@@ -3082,9 +3145,267 @@ triggerPoseReaction=function(type){
 };
 const _origTriggerYawn=triggerYawn;
 triggerYawn=function(){
+  discover("yawn");
   _origTriggerYawn();
   setTipOverride("😴","打哈欠～好困",2000);
 };
+
+/* ====================== 发现/成就系统 ====================== */
+const DISCOVERIES = {
+  expr_neutral:{icon:"😐",label:"中性表情",cat:"表情"},expr_happy:{icon:"😄",label:"开心表情",cat:"表情"},
+  expr_surprise:{icon:"😮",label:"惊讶表情",cat:"表情"},expr_angry:{icon:"😠",label:"生气表情",cat:"表情"},
+  expr_sad:{icon:"🥺",label:"难过表情",cat:"表情"},expr_kiss:{icon:"😘",label:"亲亲表情",cat:"表情"},
+  blink_single:{icon:"😉",label:"单眨眼",cat:"眨眼"},blink_double:{icon:"📸",label:"双眨眼截屏",cat:"眨眼"},
+  blink_long:{icon:"😴",label:"长闭眼",cat:"眨眼"},
+  head_nod:{icon:"🙂",label:"点头回应",cat:"头部"},head_shake:{icon:"🤔",label:"摇头回应",cat:"头部"},
+  yawn:{icon:"🥱",label:"打哈欠",cat:"脸部"},dist_near:{icon:"😳",label:"凑近害羞",cat:"脸部"},
+  dist_far:{icon:"👋",label:"远离呼唤",cat:"脸部"},presence_return:{icon:"😍",label:"回来迎接",cat:"脸部"},
+  gesture_thumbsUp:{icon:"👍",label:"点赞",cat:"手势"},gesture_peaceSign:{icon:"✌️",label:"比耶",cat:"手势"},
+  gesture_fingerHeart:{icon:"🫶",label:"手指比心",cat:"手势"},gesture_wave:{icon:"👋",label:"挥手",cat:"手势"},
+  gesture_pat:{icon:"✋",label:"摸头",cat:"手势"},gesture_hug:{icon:"🤗",label:"拥抱",cat:"手势"},
+  gesture_kiss:{icon:"💋",label:"飞吻",cat:"手势"},gesture_fist:{icon:"✊",label:"握拳加油",cat:"手势"},
+  gesture_thumbsDown:{icon:"👎",label:"不喜欢",cat:"手势"},gesture_point:{icon:"☝️",label:"指点点",cat:"手势"},
+  pose_armsUp:{icon:"🙌",label:"举手模仿",cat:"姿势"},
+  feat_record:{icon:"🎭",label:"录制表情基准",cat:"功能"},feat_calibrate:{icon:"🎯",label:"校准关键点",cat:"功能"},
+  feat_skin:{icon:"🎨",label:"切换皮肤",cat:"功能"},feat_export:{icon:"💾",label:"导出数据",cat:"功能"},
+  feat_gif:{icon:"🖼️",label:"自定义GIF",cat:"功能"},
+};
+const DISCOVERY_KEY="kc-discoveries-v1";
+let discovered=new Set();
+function loadDiscoveries(){
+  try{const raw=localStorage.getItem(DISCOVERY_KEY);if(raw){const arr=JSON.parse(raw);discovered=new Set(arr);}}catch(e){}
+}
+loadDiscoveries();
+function discover(key){
+  if(!DISCOVERIES[key]||discovered.has(key)) return false;
+  discovered.add(key);
+  try{localStorage.setItem(DISCOVERY_KEY,JSON.stringify([...discovered]));}catch(e){}
+  showDiscoveryToast(key);
+  updateDiscoveryBadge();
+  return true;
+}
+let dtTimer=null;
+function showDiscoveryToast(key){
+  const d=DISCOVERIES[key]; if(!d) return;
+  const el=$("discoveryToast");
+  el.querySelector(".dt-icon").textContent=d.icon;
+  el.querySelector(".dt-label").textContent="发现："+d.label+"！";
+  el.classList.add("show"); clearTimeout(dtTimer);
+  dtTimer=setTimeout(()=>el.classList.remove("show"),2800);
+  SoundFX.happy&&SoundFX.happy();
+}
+function updateDiscoveryBadge(){
+  const btn=$("discoveryBtn"),total=Object.keys(DISCOVERIES).length,found=discovered.size;
+  if(found<total*0.7) btn.classList.add("has-badge");
+  else btn.classList.remove("has-badge");
+}
+/* ---- 发现清单面板 ---- */
+function buildDiscoveryPanel(){
+  const panel=$("discoveryPanel");
+  const cats={}; for(const [k,d] of Object.entries(DISCOVERIES)){
+    if(!cats[d.cat]) cats[d.cat]=[];
+    cats[d.cat].push({key:k,...d});
+  }
+  const total=Object.keys(DISCOVERIES).length,found=discovered.size;
+  let html=`<h3>🏆 发现清单 <button class="dp-close" id="dpClose">✕</button></h3>
+    <span class="dp-progress">${found}/${total} 已发现</span>
+    <div class="dp-bar"><div class="dp-bar-fill" style="width:${(found/total*100)}%"></div></div>`;
+  for(const [cat,items] of Object.entries(cats)){
+    html+=`<div class="dp-cat"><div class="dp-cat-name">${cat}</div><div class="dp-grid">`;
+    for(const it of items){
+      const isFound=discovered.has(it.key);
+      html+=`<div class="dp-item${isFound?' found':''}"><span class="dpi">${isFound?it.icon:'❓'}</span>${it.label}</div>`;
+    }
+    html+=`</div></div>`;
+  }
+  panel.innerHTML=html;
+  panel.querySelector("#dpClose").addEventListener("click",()=>{
+    $("discoveryPanelOverlay").classList.remove("show");
+    SoundFX.click&&SoundFX.click();
+  });
+}
+function toggleDiscoveryPanel(){
+  const ov=$("discoveryPanelOverlay");
+  if(ov.classList.contains("show")){ov.classList.remove("show");return;}
+  buildDiscoveryPanel(); ov.classList.add("show"); SoundFX.click&&SoundFX.click();
+}
+$("discoveryPanelOverlay").addEventListener("click",e=>{
+  if(e.target===$("discoveryPanelOverlay")){$("discoveryPanelOverlay").classList.remove("show");}
+});
+
+/* ====================== 聚光灯/可视化引导 ====================== */
+const Spotlight = {
+  _el:null, _active:false,
+  init(){ this._el=$("spotlightOverlay"); },
+  show(targetSelector, padding=12){
+    if(!this._el) this.init();
+    const target=typeof targetSelector==="string"?document.querySelector(targetSelector):targetSelector;
+    if(!target){ this.clear(); return; }
+    const r=target.getBoundingClientRect();
+    const x=r.left-padding, y=r.top-padding, w=r.width+padding*2, h=r.height+padding*2;
+    // 使用 clip-path 镂空
+    const px0=x,py0=y,px1=x+w,py1=y,px2=x+w,py2=y+h,px3=x,py3=y+h;
+    const vw=window.innerWidth,vh=window.innerHeight;
+    const clip=`polygon(0% 0%,0% 100%,${(px0/vw*100).toFixed(2)}% 100%,${(px0/vw*100).toFixed(2)}% ${(py0/vh*100).toFixed(2)}%,${(px1/vw*100).toFixed(2)}% ${(py0/vh*100).toFixed(2)}%,${(px1/vw*100).toFixed(2)}% ${(py2/vh*100).toFixed(2)}%,${(px3/vw*100).toFixed(2)}% ${(py2/vh*100).toFixed(2)}%,${(px0/vw*100).toFixed(2)}% ${(py0/vh*100).toFixed(2)}%,0% ${(py0/vh*100).toFixed(2)}%,0% 0%)`;
+    this._el.style.clipPath=clip; this._el.style.webkitClipPath=clip;
+    this._el.style.display="block"; this._active=true;
+  },
+  clear(){
+    if(this._el){ this._el.style.display="none"; this._el.style.clipPath="none"; this._el.style.webkitClipPath="none"; }
+    this._active=false;
+  },
+  pulse(targetSelector, duration=2000){
+    const el=typeof targetSelector==="string"?document.querySelector(targetSelector):targetSelector;
+    if(!el) return;
+    el.style.transition="box-shadow .15s"; el.style.boxShadow="0 0 0 6px rgba(31,185,163,.5), 0 0 24px 4px rgba(31,185,163,.25)";
+    setTimeout(()=>{el.style.boxShadow="";},duration);
+  }
+};
+
+/* ====================== 交互式教程引擎 ====================== */
+const TUTORIAL_KEY="kc-tutorial-done";
+const TUTORIAL_STEPS = [
+  {id:"welcome",emoji:"👋",title:"欢迎来到互动教程！",text:"让我带你快速上手小克表情桌宠～<br>跟着提示一步步操作即可",highlight:null,validator:null,autoAdvance:3000},
+  {id:"camera",emoji:"📷",title:"第一步：开启摄像头",text:"点击下方高亮的「开启摄像头」按钮<br>然后允许浏览器使用摄像头权限",highlight:"#startBtn",validator:()=>running,waitText:"等待摄像头开启…"},
+  {id:"record_neutral",emoji:"😐",title:"第二步：录制中性表情",text:"面无表情地看着镜头<br>然后点击右侧高亮的「😐 中性」预设按钮",highlight:".preset:first-child",validator:()=>templates.length>0,waitText:"等待录制中性表情…"},
+  {id:"record_happy",emoji:"😄",title:"第三步：录制开心表情",text:"对着镜头笑一个！<br>然后点击「😄 开心」预设按钮",highlight:".preset:nth-child(2)",validator:()=>templates.length>1,waitText:"等待录制开心表情…"},
+  {id:"try_blink",emoji:"😉",title:"第四步：试试眨眼",text:"对着镜头眨一下眼睛<br>小克会注意到你的眨眼哦！",highlight:"#stage",validator:()=>discovered.has("blink_single")||discovered.has("blink_double"),waitText:"等待眨眼…"},
+  {id:"try_gesture",emoji:"✌️",title:"第五步：手势互动",text:"试试对着镜头比个 ✌️（食指+中指伸出）<br>或者 👍 点赞手势",highlight:"#stage",validator:()=>discovered.has("gesture_peaceSign")||discovered.has("gesture_thumbsUp")||discovered.has("gesture_fingerHeart"),waitText:"等待手势…"},
+  {id:"finish",emoji:"🎉",title:"准备就绪！",text:"你已解锁了小克的核心互动玩法！<br>左下角 <b>?</b> 按钮随时查看手势速查<br><b>🏆</b> 按钮查看你的发现进度<br>顶部还能切换 🎨 邦布模式哦～",highlight:"#helpBtn",validator:null,autoAdvance:7000},
+];
+let tutorialActive=false, tutorialStep=0, tutorialPaused=false, tutorialTimer=null;
+
+function startTutorial(fromStep=0){
+  tutorialActive=true; tutorialStep=fromStep; tutorialPaused=false;
+  $("tutorialOverlay").style.display="flex";
+  if(fromStep===0) Spotlight.clear();
+  renderTutorialStep();
+}
+function stopTutorial(saveDone=true){
+  tutorialActive=false; tutorialPaused=false;
+  clearTimeout(tutorialTimer);
+  $("tutorialOverlay").style.display="none";
+  Spotlight.clear();
+  if(saveDone){ try{localStorage.setItem(TUTORIAL_KEY,"1");}catch(e){} }
+}
+function renderTutorialStep(){
+  const s=TUTORIAL_STEPS[tutorialStep]; if(!s){ stopTutorial(); return; }
+  const card=$("tutorialCard");
+  // 更新高亮
+  if(s.highlight) Spotlight.show(s.highlight, s.highlight==="#stage"?20:14);
+  else Spotlight.clear();
+  // 渲染卡片
+  const isLast=tutorialStep>=TUTORIAL_STEPS.length-1;
+  const hasValidator=typeof s.validator==="function";
+  card.innerHTML=`
+    <div class="tut-emoji">${s.emoji}</div>
+    <h3>${s.title}</h3>
+    <p>${s.text}</p>
+    ${hasValidator && !s.autoAdvance?`<div class="tut-wait"><span class="spinner"></span>${s.waitText||"请稍候…"}</div>`:''}
+    <div class="tut-dots">${TUTORIAL_STEPS.map((_,i)=>`<div class="tut-dot${i===tutorialStep?' cur':''}${i<tutorialStep?' done':''}"></div>`).join("")}</div>
+    <div class="tut-actions">
+      <button class="tut-skip" id="tutSkip">跳过教程</button>
+      ${tutorialStep>0?`<button class="tut-prev" id="tutPrev">上一步</button>`:''}
+      ${!isLast?`<button class="tut-next" id="tutNext">${hasValidator&&!s.autoAdvance?'跳过此步':'下一步'}</button>`:`<button class="tut-next" id="tutDone">完成 🚀</button>`}
+    </div>`;
+  bindTutorialBtns();
+  // 自动推进步骤
+  if(s.autoAdvance && s.autoAdvance>0){
+    clearTimeout(tutorialTimer);
+    tutorialTimer=setTimeout(()=>{ tutorialStep++; renderTutorialStep(); },s.autoAdvance);
+  }
+  // 有 validator 的步骤：定时检查
+  if(hasValidator && !s.autoAdvance){
+    checkTutorialValidator();
+  }
+}
+function checkTutorialValidator(){
+  if(!tutorialActive) return;
+  const s=TUTORIAL_STEPS[tutorialStep]; if(!s||!s.validator) return;
+  if(s.validator()){
+    // 步骤完成，推进
+    tutorialStep++;
+    clearTimeout(tutorialTimer);
+    setTimeout(()=>renderTutorialStep(), 500);
+  }else{
+    tutorialTimer=setTimeout(()=>checkTutorialValidator(), 800);
+  }
+}
+function bindTutorialBtns(){
+  const card=$("tutorialCard");
+  const skip=card.querySelector("#tutSkip"),prev=card.querySelector("#tutPrev"),
+        next=card.querySelector("#tutNext"),done=card.querySelector("#tutDone");
+  skip&&skip.addEventListener("click",()=>{stopTutorial(true);SoundFX.click&&SoundFX.click();});
+  prev&&prev.addEventListener("click",()=>{tutorialStep--;clearTimeout(tutorialTimer);renderTutorialStep();SoundFX.click&&SoundFX.click();});
+  next&&next.addEventListener("click",()=>{
+    const s=TUTORIAL_STEPS[tutorialStep];
+    if(s.validator&&!s.autoAdvance){
+      // 手动跳过此步
+      tutorialStep++; clearTimeout(tutorialTimer); renderTutorialStep();
+    }else{
+      tutorialStep++; clearTimeout(tutorialTimer); renderTutorialStep();
+    }
+    SoundFX.click&&SoundFX.click();
+  });
+  done&&done.addEventListener("click",()=>{stopTutorial(true);if(!running&&modelsReady)startCamera();});
+}
+// 窗口大小变化时更新聚光灯
+window.addEventListener("resize",()=>{
+  if(tutorialActive && TUTORIAL_STEPS[tutorialStep]?.highlight){
+    Spotlight.show(TUTORIAL_STEPS[tutorialStep].highlight, TUTORIAL_STEPS[tutorialStep].highlight==="#stage"?20:14);
+  }
+});
+
+/* ====================== 功能探索提示 ====================== */
+const HINT_CONFIG={checkInterval:120000,minSessionTime:300000,maxHintsPerSession:3,cooldownBetweenHints:180000};
+const HINT_POOL=[
+  {key:"gesture_thumbsUp",text:"试试对着镜头比个 👍 点赞手势？",icon:"👍"},
+  {key:"blink_double",text:"快速眨两下眼睛可以截屏哦 📸",icon:"😉"},
+  {key:"gesture_pat",text:"把手放在头顶上方向下压，可以摸我的头～",icon:"✋"},
+  {key:"dist_near",text:"凑近摄像头看看我会有什么反应？",icon:"🔍"},
+  {key:"gesture_hug",text:"双手靠近胸前试试拥抱我？",icon:"🤗"},
+  {key:"gesture_kiss",text:"手靠近嘴边再向外推，试试飞吻？",icon:"💋"},
+  {key:"yawn",text:"打个哈欠试试看？小克会跟着犯困",icon:"🥱"},
+  {key:"gesture_wave",text:"手在脸前左右摆动可以跟我挥手",icon:"👋"},
+  {key:"head_nod",text:"对着镜头点点头试试？",icon:"🙂"},
+  {key:"pose_armsUp",text:"举起双手，小克会跟着模仿！",icon:"🙌"},
+  {key:"feat_skin",text:"点顶部「邦布模式」按钮可以切换皮肤哦",icon:"🎨"},
+  {key:"feat_calibrate",text:"识别不准？试试用校准模式微调",icon:"🎯"},
+];
+let hintSessionStart=0, hintCountThisSession=0, lastHintTime=0, hintCheckTimer=null;
+function initHintScheduler(){
+  hintSessionStart=performance.now(); hintCountThisSession=0; lastHintTime=0;
+  scheduleHintCheck();
+}
+function scheduleHintCheck(){
+  if(hintCheckTimer) clearInterval(hintCheckTimer);
+  hintCheckTimer=setInterval(checkHints, HINT_CONFIG.checkInterval);
+}
+function checkHints(){
+  const now=performance.now();
+  if(now-hintSessionStart<HINT_CONFIG.minSessionTime) return;
+  if(hintCountThisSession>=HINT_CONFIG.maxHintsPerSession) return;
+  if(now-lastHintTime<HINT_CONFIG.cooldownBetweenHints) return;
+  if(tutorialActive) return; // 教程中不打扰
+  // 找一条未发现的提示
+  const available=HINT_POOL.filter(h=>!discovered.has(h.key));
+  if(available.length===0) return;
+  const hint=available[Math.floor(Math.random()*available.length)];
+  showHintBubble(hint);
+  hintCountThisSession++; lastHintTime=now;
+}
+function showHintBubble(hint){
+  const wrap=$("hintBubbleWrap"), bubble=$("hintBubble");
+  bubble.innerHTML=`<span>${hint.icon}</span> ${hint.text}`;
+  wrap.classList.add("show");
+  clearTimeout(wrap._ht);
+  wrap._ht=setTimeout(()=>wrap.classList.remove("show"), 6000);
+  // 滑动关闭
+  bubble.onclick=()=>{wrap.classList.remove("show");clearTimeout(wrap._ht);};
+}
+function hideHintBubble(){
+  $("hintBubbleWrap").classList.remove("show");
+}
 
 /* ====================== 皮肤切换 ====================== */
 const SKIN_KEY="kc-skin-mode";
@@ -3096,6 +3417,7 @@ function initSkinToggle(){
     localStorage.setItem(SKIN_KEY,skinMode);
     updateSkinButton();
     toast(skinMode==="bangboo"?"已切换为 🎨 邦布精灵":"已切换为 👾 像素小克",1500);
+    discover("feat_skin");
     SoundFX.click();
   });
 }
@@ -3114,13 +3436,17 @@ initSkinToggle();
 applyMood("neutral");
 updateHelpSection();
 initCheatSheet();
+// 帮助区按钮绑定
+$("helpReplayTutorial")?.addEventListener("click",()=>startTutorial(0));
+$("helpDiscoveryPanel")?.addEventListener("click",toggleDiscoveryPanel);
 // 启动像素宠物渲染循环
 petRenderLoop();
 // 自动开始加载模型
 initModels().catch(()=>{});
-// 显示引导 + 启动上下文提示轮播
+// 显示引导 + 启动上下文提示轮播 + 功能探索提示
 showOnboard();
 startTipRotation();
+initHintScheduler();
 // 如果本地已有基准，重新计算标准差
 if(templates.length>0) recomputeStd();
 </script>
@@ -3129,6 +3455,24 @@ if(templates.length>0) recomputeStd();
 <div class="onboard-overlay" id="onboardOverlay" style="display:none">
 <div class="onboard-card" id="onboardCard"></div>
 </div>
+
+<!-- ===== 聚光灯遮罩 ===== -->
+<div class="spotlight-overlay" id="spotlightOverlay" style="display:none"></div>
+
+<!-- ===== 交互式教程卡片 ===== -->
+<div class="tutorial-overlay" id="tutorialOverlay" style="display:none">
+<div class="tutorial-card" id="tutorialCard"></div>
+</div>
+
+<!-- ===== 发现庆祝 Toast ===== -->
+<div class="discovery-toast" id="discoveryToast"><span class="dt-icon"></span><span class="dt-label"></span></div>
+
+<!-- ===== 发现清单面板 ===== -->
+<div class="discovery-panel-overlay" id="discoveryPanelOverlay">
+<div class="discovery-panel" id="discoveryPanel"></div>
+</div>
+
+<!-- ===== 功能提示气泡 (在 stage 内) ===== -->
 
 </body>
 </html>
